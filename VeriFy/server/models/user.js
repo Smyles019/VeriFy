@@ -30,7 +30,7 @@ phone: {
     unique: true,
     validate: {
     validator: (v) => v.length >= 10 && v.length <= 15 && /^\d+$/.test(v),
-    message: "Phone number must be 10 to 15 digits long and contain only numbers", // Validate phone number length and format
+    message: "Invalid format", // Validate phone number length and format
   }
 },
 

@@ -1,32 +1,44 @@
 import { Link } from "react-router-dom";
 
 const Navbar = () => {
-    return(
-       <nav className="bg-blue-800 text-white px-6 flex
-       justify-between items-center">
-        <div className="flex items-center space-x-4">
-            <img src="/assets/v-logo.png" className="h-8"/>
-            <h1 className="text-xl font-bold">VeriFy</h1>
-            <div className="hidden md: flex space-x-4 ml-8">
-                <Link to="/">Latest</Link>
-                <Link to="/politics">Politics</Link>
-                <Link to="/health">Health</Link>
-                <Link to="/business">Business</Link>
-                <Link to="/entertainment">Entertainment</Link>
-                <Link to="/sports">Sports</Link> 
-            </div>
+
+    return (
+    <>
+      {/* Top blue section */}
+      <nav className="bg-blue-800 text-white px-6 py-4 flex justify-between items-center">
+        {/*Left: Logo*/}
+        <div className="flex items-center space-x-4">  
+          <span className="font-bold text-white text-lg">Logo</span>    
         </div>
-        <div className="flex items-center space-x-2">
-          <input 
-          type="text" 
-          placeholder="Search"
-          className="rounded-md px-2 py-1 text-black"
+
+        {/*Center: Title */}
+         <h1 className="absolute left-1/2 transform -translate-x-1/2 text-xl font-bold">VeriFy</h1>
+
+         {/*Right: Search sign in, subscribe */}
+        <div className="flex items-center space-x-4">
+          <input
+            type="text"
+            placeholder="Search"
+            className="rounded-md px-3 py-1 text-black focus:outline-none"
           />
-          <button className="bg-zinc-700 text-black px-3 py-1 rounded">Subscribe</button>
-          <Link to="/login" className="underline">Sign In</Link>
-          </div>
-          </nav>
-    )
+          <button className="bg-black text-white px-4 py-1 rounded">Subscribe</button>
+          <Link to="/login" className="underline">Sign in</Link>
+        </div>
+      </nav>
+
+      {/* Bottom white section with nav links */}
+      <div className="bg-gray-100 text-black px-6 py-2 flex justify-center space-x-6 text-sm font-medium">
+        <Link to="/">LATEST</Link>
+        <Link to="/politics">POLITICS</Link>
+        <Link to="/health">HEALTH</Link>
+        <Link to="/business">BUSINESS</Link>
+        <Link to="/entertainment">ENTERTAINMENT</Link>
+        <Link to="/sports">SPORTS</Link>
+      </div>
+    </>
+  ) 
+    
+
 }
 
 export default Navbar

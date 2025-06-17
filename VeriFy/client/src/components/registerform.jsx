@@ -60,7 +60,7 @@ const SignupForm = () => {
     >
       <div className="absolute inset-0 bg-black/40 z-0"></div>
 
-      <div className="bg-white/10 backdrop-blur-md p-10 rounded-2xl shadow-2xl w-[90%] max-w-4xl z-10">
+      <div className="bg-white/10 backdrop-blur-md p-10 rounded-2xl shadow-2xl w-[90%] max-w-4xl z-10 ">
         <div className="text-center mb-8">
           <h1 className="text-4xl font-bold">
             <span className="text-black">Veri</span>

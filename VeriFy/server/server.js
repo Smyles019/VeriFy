@@ -1,18 +1,16 @@
-const express = require("express");
-const mongoose = require("mongoose");
-const cors = require("cors");
-const bcrypt = require("bcrypt");
+import express from "express";
+import mongoose from "mongoose";
+import cors from "cors";
+import dotenv from "dotenv"; // Importing authRoutes using ES6 import syntax
+import authRoutes from "./routes/auth.js";
 
+dotenv.config(); 
 
 const app = express();
 app.use(express.json());
 app.use(cors());
 
-const authRoutes = require("./routes/auth");
-app.use("/api/auth", authRoutes);
-
-require("dotenv").config();
-console.log("Loaded URI:", process.env.MONGO_URI);
+app.use("/api", authRoutes);
 
 
 mongoose.connect(process.env.MONGO_URI)

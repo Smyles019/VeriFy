@@ -1,5 +1,4 @@
-// src/App.jsx
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route, BrowserRouter } from "react-router-dom";
 import RegisterForm from "./components/registerform.jsx";
 import RegistrationSuccess from "./pages/registrationsuccess.jsx";
 import Layout from "./components/layout.jsx";
@@ -8,7 +7,7 @@ import LoginForm from "./components/loginform.jsx";
 
 function App() {
   return (
-    <Router>
+    <BrowserRouter>
       <Layout> {/* Layout wraps all routed pages */}
         <Routes>
           <Route path="/register" element={<RegisterForm />} />
@@ -17,7 +16,7 @@ function App() {
           <Route path="*" element={<div className="text-center mt-10">404 - Page Not Found</div>} />
         </Routes>
       </Layout>
-    </Router>
+    </BrowserRouter>
   );
 }
 

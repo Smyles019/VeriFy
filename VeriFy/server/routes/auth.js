@@ -5,9 +5,9 @@ import User from "../models/user.js"; // Use .js extension in ES Modules
 const router = express.Router();
 
 router.post("/register", async (req, res) => {
-  const { username, email, phone, password } = req.body;
+  const { firstName, lastName, email, phone, password } = req.body;
 
-  if (!username || !email || !password) {
+  if (!firstName || !lastName || !email || !password) {
     return res.status(400).json({ message: "Missing required fields" });
   }
 try {
@@ -18,7 +18,9 @@ try {
 
     const saltRounds = 10;
     const hashedPassword = await bcrypt.hash(password, saltRounds);
-
+     
+    const username = `${firstName} ${lastName}`;
+    
     const newUser = new User({
       username,
       email,

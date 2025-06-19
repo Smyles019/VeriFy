@@ -9,6 +9,6 @@ const RegistrationSuccess = () => (
       Go to Login
     </Link>
   </div>
-);
+)
 
-export default RegistrationSuccess;
+export default RegistrationSuccess

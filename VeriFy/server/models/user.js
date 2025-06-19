@@ -3,7 +3,7 @@ import mongoose from "mongoose";
 const UserSchema = new mongoose.Schema
 (
 {
-fisrtName: {
+firstName: {
     type: String,
     required: true,
   },
@@ -12,6 +12,9 @@ lastName: {
     type: String,
     required: true,
     },
+username: {
+    type: String,
+},
 email: {
     type: String,
     required: true,

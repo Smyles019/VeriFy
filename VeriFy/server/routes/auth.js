@@ -22,18 +22,21 @@ try {
     const username = `${firstName} ${lastName}`;
     
     const newUser = new User({
-      username,
+      firstName,
+      lastName,
+      username:`${firstName} ${lastName}`,
       email,
       phone,
       password: hashedPassword,
     });
 
     await newUser.save();
-
-    res.status(201).json({ message: "User registered successfully" });
+    
+    console.log("✅ User saved!");
+    res.status(201).json({ message: "User registered successfully!" });
   } catch (err) {
     console.error("❌ Error saving user:", err);
-    res.status(500).json({ message: "Server error" });
+    res.status(500).json({ error: "Failed to register user" });
   }
 });
 

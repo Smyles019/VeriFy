@@ -1,20 +1,18 @@
-const express = require("express");
-const mongoose = require("mongoose");
-const cors = require("cors");
-const bcrypt = require("bcrypt");
+import express from "express";
+import mongoose from "mongoose";
+import cors from "cors";
+import dotenv from "dotenv";
+import authRoutes from "./routes/auth.js";
 
+dotenv.config(); 
 
 const app = express();
 app.use(express.json());
 app.use(cors());
 
-const authRoutes = require("./routes/auth");
 app.use("/api/auth", authRoutes);
 
-require("dotenv").config();
-console.log("Loaded URI:", process.env.MONGO_URI);
-
-
+const PORT = process.env.PORT || 5000;
 mongoose.connect(process.env.MONGO_URI)
   .then(() => {
     console.log("MongoDB connected");

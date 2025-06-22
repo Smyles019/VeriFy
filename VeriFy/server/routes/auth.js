@@ -1,40 +1,44 @@
-const express = require("express");
+import express from "express";
+import bcrypt from "bcrypt";
+import User from "../models/user.js"; // Use .js extension in ES Modules
+
 const router = express.Router();
-const User = require("../models/user.js");
-const bcrypt = require("bcrypt");
 
-// Register
 router.post("/register", async (req, res) => {
-  try {
-    const { username, email, password } = req.body;
-    const hashedPassword = await bcrypt.hash(password, 10);
+  const { firstName, lastName, email, phone, password } = req.body;
+
+  if (!firstName || !lastName || !email || !password) {
+    return res.status(400).json({ message: "Missing required fields" });
+  }
+try {
+    const existingUser = await User.findOne({ email });
+    if (existingUser) {
+      return res.status(409).json({ message: "Email already in use" });
+    }
+
+    const saltRounds = 10;
+    const hashedPassword = await bcrypt.hash(password, saltRounds);
+     
+    const username = `${firstName} ${lastName}`;
     
-    const newUser = new User({ username, email, password: hashedPassword });
+    const newUser = new User({
+      firstName,
+      lastName,
+      username:`${firstName} ${lastName}`,
+      email,
+      phone,
+      password: hashedPassword,
+    });
+
     await newUser.save();
-
-    res.status(201).json({ message: "User registered successfully" });
+    
+    console.log("✅ User saved!");
+    res.status(201).json({ message: "User registered successfully!" });
   } catch (err) {
-    console.error("Registration error:", err);
-    res.status(500).json({ error: "Registration failed" });
+    console.error("❌ Error saving user:", err);
+    res.status(500).json({ error: "Failed to register user" });
   }
 });
 
-// Login
-router.post("/login", async (req, res) => {
-  try {
-    const { email, password } = req.body;
 
-    const user = await User.findOne({ email });
-    if (!user) return res.status(401).json({ error: "Invalid email or password" });
-
-    const isMatch = await bcrypt.compare(password, user.password);
-    if (!isMatch) return res.status(401).json({ error: "Invalid email or password" });
-
-    res.status(200).json({ message: "Login successful" });
-  } catch (err) {
-    console.error("Login error:", err);
-    res.status(500).json({ error: "Login failed" });
-  }
-});
-
-module.exports = router;
+export default router;

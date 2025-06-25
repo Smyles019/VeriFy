@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { FaEdit, FaTrashAlt, FaBars } from 'react-icons/fa'
-import logo from '../assets/logo.png'
+import logo from '../assets/logo1.png'
 import { Link } from 'react-router-dom';
 
 const drafts = [
@@ -29,7 +29,7 @@ const ReporterDashboard = () => {
           <img className='w-12'src={logo}/>
         </div>
         <nav className="flex-1 py-6 px-4 space-y-4">
-          <a href="#" className="block hover:bg-blue-700 rounded px-3 py-2">Home</a>
+          <Link to="/" className="block hover:bg-blue-700 rounded px-3 py-2">Home</Link>
           <a href="#" className="block hover:bg-blue-700 rounded px-3 py-2">My Articles</a>
           <a href="#" className="block hover:bg-blue-700 rounded px-3 py-2">Claims</a>
           <a href="#" className="block hover:bg-blue-700 rounded px-3 py-2">Profile</a>

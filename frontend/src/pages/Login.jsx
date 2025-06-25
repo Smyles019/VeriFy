@@ -5,6 +5,8 @@ import { useNavigate } from "react-router-dom";
 
 const Login = () => {
 
+  const navigate = useNavigate();
+
   const [formData, setFormData] = useState({ email: "", password: "" });
 
   const handleChange = (e) => {
@@ -27,6 +29,7 @@ const Login = () => {
       const data = await res.json();
       if (res.ok) {
         alert("Logged in successfully!");
+        navigate("/reporterdashboard");
       } else {
         alert(data.message);
       }
@@ -83,7 +86,7 @@ const Login = () => {
             <label className="flex items-center">
               <input type="checkbox" className="mr-2" /> Remember me
             </label>
-            <a href="/forgot-password" className="text-blue-300 underline hover:text-blue-400">
+            <a href="/forgotpassword" className="text-blue-300 underline hover:text-blue-400">
               Forgot password?
             </a>
           </div>

@@ -1,50 +1,6 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
 
-<<<<<<< HEAD
-const Register = () => {
-    
-    const navigate = useNavigate();
-
-    const handleSubmit = async (e) => {
-       e.preventDefault(); 
-
-       const form = e.target();
-       const data ={
-        firstName: form[0].value,
-        lastName: form[1].value,
-        email: form[2].value,
-        phone: form[3].value,
-        password: form[4].value,
-       };
-
-        try {
-         const res = await fetch("http://localhost:5000/api/auth/register", {
-         method: "POST",
-         headers: {
-           "Content-Type": "application/json",
-       },
-       
-       body: JSON.stringify(data),
-       });
-
-        const result = await res.json();
-
-        if (res.ok) {
-        alert("Registered successfully!");
-        navigate("/login");
-        } else {
-          alert(result.error || "Registration failed");
-        }
-        } catch (err) {
-           console.error(err);
-           alert("Something went wrong");
-       }   
-    }
-
-    return(
-        <div
-=======
 
 const Register = () => {
 
@@ -88,7 +44,6 @@ const Register = () => {
 
   return (
     <div
->>>>>>> 8b55933c5c3368d34822f28fb3da655c587cce9e
       className="h-screen w-screen flex items-center justify-center bg-cover bg-center relative"
       style={{ backgroundImage: "url('/bg1.jpg')" }} 
     >
@@ -203,18 +158,8 @@ const Register = () => {
           </div>
         </form>
       </div>
-<<<<<<< HEAD
-    </div> 
-
- )
-
-}
-
-export default Register;
-=======
     </div>
   );
 };
 
 export default Register;
->>>>>>> 8b55933c5c3368d34822f28fb3da655c587cce9e

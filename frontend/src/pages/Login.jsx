@@ -1,26 +1,3 @@
-<<<<<<< HEAD
-import React, {useState} from "react";
-import { useNavigate } from "react-router-dom";
-
-const Login = () =>  {
-
-    const [formData, setFormData] = useState({email: "", password:""});
-
-    const handleChange = (e) => {
-        setFormData(prev => ({
-            ...prev,
-            [e.target.name]: e.target.value,
-
-        }));
-    }
-
-    const handleSubmit = async (e) => {
-        e.preventDefault();
-    
-
-    try{
-       const res = await fetch("http://localhost:5000/api/auth/login", {
-=======
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Link } from "react-router-dom";
@@ -46,7 +23,6 @@ const Login = () => {
 
     try {
       const res = await fetch("http://localhost:5000/api/auth/login", {
->>>>>>> 8b55933c5c3368d34822f28fb3da655c587cce9e
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formData),
@@ -55,29 +31,18 @@ const Login = () => {
       const data = await res.json();
       if (res.ok) {
         alert("Logged in successfully!");
-<<<<<<< HEAD
-=======
         navigate("/reporterdashboard");
->>>>>>> 8b55933c5c3368d34822f28fb3da655c587cce9e
       } else {
         alert(data.message);
       }
     } catch (err) {
       alert("Error: " + err.message);
     }
-<<<<<<< HEAD
-
-    }
-
-    return (
-        <div
-=======
   };
 
   
   return (
     <div
->>>>>>> 8b55933c5c3368d34822f28fb3da655c587cce9e
       className="h-screen w-screen flex items-center justify-center bg-cover bg-center relative"
       style={{ backgroundImage: "url('/bg1.jpg')" }} 
     >
@@ -123,16 +88,10 @@ const Login = () => {
             <label className="flex items-center">
               <input type="checkbox" className="mr-2" /> Remember me
             </label>
-<<<<<<< HEAD
-            <a href="/forgot-password" className="text-blue-300 underline hover:text-blue-400">
-              Forgot password?
-            </a>
-=======
                <Link to="/forgot-password" className="text-blue-300 underline hover:text-blue-400">
                
                 Forgot password?
               </Link>
->>>>>>> 8b55933c5c3368d34822f28fb3da655c587cce9e
           </div>
 
           <div>
@@ -152,17 +111,8 @@ const Login = () => {
           </div>
         </form>
       </div>
-<<<<<<< HEAD
-    </div> 
-    
- )
-   
-}
-export default Login;
-=======
     </div>
   );
 };
 
 export default Login;
->>>>>>> 8b55933c5c3368d34822f28fb3da655c587cce9e

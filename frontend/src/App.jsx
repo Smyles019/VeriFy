@@ -5,6 +5,8 @@ import NewsSection from './components/NewsSection'
 import CategorySlider from './components/CategorySlider'
 import Footer from './components/Footer'
 import ReporterDashboard from './pages/ReporterDashboard'
+import Login from "./pages/Login"
+import Register from "./pages/Register"
 
 
 
@@ -15,7 +17,7 @@ const Home = () => (
     
   </main>
 )
-const Login = () => <h2>Login Page</h2>
+//const Login = () => <h2>Login Page</h2>
 const NotFound = () => <h2>404 Not Found</h2>
 
 
@@ -27,6 +29,7 @@ const App = () => {
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/login" element={<Login />} />
+        <Route path="/register" element={<Register/>} />
         <Route path="*" element={<NotFound />} />        
         <Route path="/reporterdashboard" element={<ReporterDashboard />} />
       </Routes>

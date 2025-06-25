@@ -1,5 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
+
 
 
 
@@ -86,9 +88,10 @@ const Login = () => {
             <label className="flex items-center">
               <input type="checkbox" className="mr-2" /> Remember me
             </label>
-            <a href="/forgotpassword" className="text-blue-300 underline hover:text-blue-400">
-              Forgot password?
-            </a>
+               <Link to="/forgot-password" className="text-blue-300 underline hover:text-blue-400">
+               
+                Forgot password?
+              </Link>
           </div>
 
           <div>

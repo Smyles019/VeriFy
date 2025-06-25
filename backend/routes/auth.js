@@ -1,6 +1,12 @@
 import express from "express";
 import bcrypt from "bcrypt";
 import User from "../models/User.js";
+import crypto from "crypto";
+import sendEmail from "../utils/sendEmail.js";
+import {
+  forgotPassword,
+  resetPassword
+} from "../controllers/authController.js";
 
 
 const router = express.Router();
@@ -56,6 +62,9 @@ router.post("/login", async (req, res) => {
     res.status(500).json({ message: "Login failed", error: error.message });
   }
 });
+
+router.post("/forgot-password", forgotPassword);
+router.post("/reset-password/:token", resetPassword);
 
 
 export default router;

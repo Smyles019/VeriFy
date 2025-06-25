@@ -7,6 +7,8 @@ import Footer from './components/Footer'
 import ReporterDashboard from './pages/ReporterDashboard'
 import Login from "./pages/Login"
 import Register from "./pages/Register"
+import ForgotPassword from "./pages/ForgotPassword"
+import ResetPassword from "./pages/ResetPassword"
 
 
 
@@ -32,6 +34,9 @@ const App = () => {
         <Route path="/register" element={<Register />} />
         <Route path="*" element={<NotFound />} />        
         <Route path="/reporterdashboard" element={<ReporterDashboard />} />
+        <Route path="/forgot-password" element={<ForgotPassword />} />
+        <Route path="/reset-password/:token" element={<ResetPassword />} />
+
   
         
       </Routes>

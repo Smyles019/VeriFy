@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { FaEdit, FaTrashAlt, FaBars } from 'react-icons/fa'
 import Modal from '../components/Modal'
 import ReactQuill from 'react-quill'
@@ -11,28 +11,47 @@ import { Link } from 'react-router-dom';
 const ReporterDashboard = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
-  const [drafts, setDrafts] = useState ([
-    "Robbery attempt in Ngara Road",
-    "Outbreak of mysterious illness in the coastal region",
-    "Fuel prices reported to increase this month"
-  ]);
-
+  const [drafts, setDrafts] = useState ([]);
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
   const [tags, setTags] = useState([]);
   const [newTag, setNewTag] = useState("");
   const [image, setImage] = useState(null);
 
-  const handleSave = () => {
-    if (title.trim()) {
-      setDrafts([...drafts, title]);
+  useEffect(() => {
+    axios.get("http://localhost:5000/api/drafts")
+       .then(res => setDrafts(res.data))
+       .catch(err => console.error(err));
+  }, []);
+
+  const handleSave = async () => {
+    if(!title.trim()) return;
+    try{
+      const res =  await axios.post('http://localhost:5000/api/drafts', {
+        title,
+        content, 
+        tags,
+        image   
+      });
+      setDrafts([...drafts, res.data]);
+    } catch (error) {
+      console.error('Failed to save draft:', error);
     }
     setModalOpen(false);
     setTitle("");
     setContent("");
     setTags([]);
     setNewTag("");
-    setImage(null);
+    setImage(null);    
+  };
+
+  const handleDelete = async (id) => {
+    try{
+      await axios.delete(`http://localhost:5000/api/drafts/${id}`);
+      setDrafts(drafts.filter(d => d._id !==id ));   
+    } catch (error){
+      console.error('Failed to delete draft:', error);
+    }
   };
 
  return (
@@ -77,14 +96,22 @@ const ReporterDashboard = () => {
         </div>
 
         <div className="space-y-4">
-          {drafts.map((title, idx) => (
-            <div key={idx} className="bg-blue-100 px-4 py-3 rounded flex justify-between items-center">
-              <p>{title}</p>
+          {drafts.map((draft, idx) => (
+            <div key={draft._id || idx} className="bg-blue-100 px-4 py-3 rounded flex justify-between items-center">
+              <div>
+              <p className='font-semibold'>{draft.title}</p>
+              <p className='text-sm text-gray-600'>
+                {draft.tags && draft.tags.length > 0 && draft.tags.map(tag => `#${tag}`).join('')}
+              </p>
+              <p className='text-xs text-gray-500'>
+                {new Date(draft.createdAt).toLocaleDateString()}
+              </p>
+              </div>
               <div className="space-x-4">
                 <button className="text-gray-700 hover:text-blue-800">
                   <FaEdit />
                 </button>
-                <button className="text-gray-700 hover:text-red-600">
+                <button onClick={() => handleDelete(draft._id)} className="text-gray-700 hover:text-red-600">
                   <FaTrashAlt />
                 </button>
               </div>
@@ -143,7 +170,7 @@ const ReporterDashboard = () => {
           <button 
                onClick={() => {
                 if (newTag.trim()) {
-                  nsetTags([...tags, newTag.trim()]);
+                  setTags([...tags, newTag.trim()]);
                   setNewTag("");
                 }
               }}

@@ -18,31 +18,78 @@ const ReporterDashboard = () => {
   const [newTag, setNewTag] = useState("");
   const [image, setImage] = useState(null);
 
+  //State for editing drafts
+  const [editingDraft, setEditingDraft] = useState(null);
+  const [isEditing, setIsEditing] = useState(false);
+
   useEffect(() => {
     axios.get("http://localhost:5000/api/drafts")
        .then(res => setDrafts(res.data))
        .catch(err => console.error(err));
   }, []);
 
+  //Function to open modal for new article
+  const openNewArticleModal = () => {
+    setIsEditing(false);
+    setEditingDraft(null);
+    clearForm();
+    setModalOpen(true);
+  };
+
+  //Function to open modal for existing article
+  const openEditModal = (draft) => {
+    setIsEditing(true);
+    setEditingDraft(draft);
+    setTitle(draft.title);
+    setContent(draft.content || "");
+    setTags(draft.tags || []);
+    setImage(draft.image || null);
+    setModalOpen(true);
+  };
+  
+  //Function to clear form
+  const clearForm = () => {
+    setTitle("");
+    setContent("");
+    setTags([]);
+    setNewTag("");
+    setImage(null);
+  };
+
   const handleSave = async () => {
-    if(!title.trim()) return;
+    if(!title.trim()) return;   
     try{
-      const res =  await axios.post('http://localhost:5000/api/drafts', {
+      if(isEditing && editingDraft){
+      
+        //Update exisiting draft
+      const res =  await axios.put(`http://localhost:5000/api/drafts/${editingDraft._id}`, {
         title,
         content, 
         tags,
         image   
       });
+
+      //Update the drafts array with the updated draft      
+      setDrafts(drafts.map(d => d._id === editingDraft._id ? res.data : d));
+    } else{
+      //Create new draft
+      const res = await axios.post('http://localhost:5000/api/drafts', {
+        title,
+        content,
+        tags,
+        image
+      });
       setDrafts([...drafts, res.data]);
+     }   
     } catch (error) {
       console.error('Failed to save draft:', error);
     }
+
+    //close modal and reset form
     setModalOpen(false);
-    setTitle("");
-    setContent("");
-    setTags([]);
-    setNewTag("");
-    setImage(null);    
+    clearForm();
+    setIsEditing(false);
+    setEditingDraft(null);  
   };
 
   const handleDelete = async (id) => {
@@ -52,6 +99,13 @@ const ReporterDashboard = () => {
     } catch (error){
       console.error('Failed to delete draft:', error);
     }
+  };
+
+  const handleCloseModal = () => {
+    setModalOpen(false);
+    clearForm();
+    setIsEditing(false);
+    setEditingDraft(null);
   };
 
  return (
@@ -90,7 +144,7 @@ const ReporterDashboard = () => {
       <main className="p-6 bg-gray-100 min-h-screen">
         <div className="flex justify-between items-center mb-6">
           <h2 className="text-2xl font-semibold">Your drafts</h2>
-          <button onClick={() => setModalOpen(true)} className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
+          <button onClick={openNewArticleModal} className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
             + New Article
           </button>
         </div>
@@ -104,11 +158,15 @@ const ReporterDashboard = () => {
                 {draft.tags && draft.tags.length > 0 && draft.tags.map(tag => `#${tag}`).join('')}
               </p>
               <p className='text-xs text-gray-500'>
-                {new Date(draft.createdAt).toLocaleDateString()}
+                {new Date(draft.createdAt).toLocaleDateString('en-GB', {
+                  day: '2-digit',
+                  month: '2-digit',
+                  year: 'numeric'
+                })}
               </p>
               </div>
               <div className="space-x-4">
-                <button className="text-gray-700 hover:text-blue-800">
+                <button onClick={() => openEditModal(draft)} className="text-gray-700 hover:text-blue-800">
                   <FaEdit />
                 </button>
                 <button onClick={() => handleDelete(draft._id)} className="text-gray-700 hover:text-red-600">
@@ -121,10 +179,11 @@ const ReporterDashboard = () => {
       </main>
 
       {/*Modal*/}
-      <Modal isOpen={modalOpen} onClose={handleSave}>
+      <Modal isOpen={modalOpen} onClose={handleCloseModal}>
         <div className='space-y-4'>
-          <h2 className='text-xl font-bold'>New Article</h2>
-
+          <h2 className='text-xl font-bold'>
+            {isEditing ? `Edit: ${editingDraft?.title || 'Article'}` : 'New Article'}
+          </h2>
           <input
             type='text'
             placeholder='Title'
@@ -152,7 +211,7 @@ const ReporterDashboard = () => {
               >
                 #{tag}
                 <button
-                  onClick={() => setTags(tags.filter((_, index) => index !==1))}
+                  onClick={() => setTags(tags.filter((_, index) => index !==i))}
                   className='ml-2 text-red-600 font-bold'                  
                 >
                   x
@@ -184,7 +243,7 @@ const ReporterDashboard = () => {
             onClick={handleSave}
             className="w-full bg-blue-700 text-white py-2 rounded mt-4"
           >
-            Save Article          
+           {isEditing ? 'Update Artilce' : 'Save Article'}         
           </button>
         </div>
 

@@ -13,8 +13,6 @@ import FactCheckerDashboard from './pages/FactCheckerDashboard'
 import ReviewClaim from './pages/ReviewClaim'
 
 
-
-
 const Home = () => (
   <main className='px-4 md:px-12 lg:px-20'>
     <NewsSection />

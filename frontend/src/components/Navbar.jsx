@@ -1,4 +1,5 @@
 import { Link } from "react-router-dom";
+import logo from '../assets/logo.png'
 
 const Navbar = () => {
 
@@ -8,7 +9,7 @@ const Navbar = () => {
       <nav className="bg-blue-800 text-white px-6 py-4 flex justify-between items-center">
         {/*Left: Logo*/}
         <div className="flex items-center space-x-4">  
-          <span className="font-bold text-white text-lg">Logo</span>    
+          <img className='w-12'src={logo}/>    
         </div>
 
         {/*Center: Title */}
@@ -21,7 +22,9 @@ const Navbar = () => {
             placeholder="Search"
             className="rounded-md px-3 py-1 text-black focus:outline-none"
           />
+          <Link to="/register">
           <button className="bg-black text-white px-4 py-1 rounded">Subscribe</button>
+          </Link>
           <Link to="/login" className="underline">Sign in</Link>
         </div>
       </nav>

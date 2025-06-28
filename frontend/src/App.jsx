@@ -9,7 +9,7 @@ import Login from "./pages/Login"
 import Register from "./pages/Register"
 import ForgotPassword from "./pages/ForgotPassword"
 import ResetPassword from "./pages/ResetPassword"
-import ReviewerDashboard from './pages/ReviewerDashboard'
+import FactCheckerDashboard from './pages/FactCheckerDashboard'
 import ReviewClaim from './pages/ReviewClaim'
 
 
@@ -38,8 +38,8 @@ const App = () => {
         <Route path="/reporterdashboard" element={<ReporterDashboard />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/reset-password/:token" element={<ResetPassword />} />
-        <Route path="/dashboard/reviewer" element={<ReviewerDashboard />} />
-        <Route path="/review/:id" element={<ReviewClaim />} />
+        <Route path="/factcheckerdashboard" element={<FactCheckerDashboard />} />
+        <Route path="/reviewclaim" element={<ReviewClaim />} />
 
 
   

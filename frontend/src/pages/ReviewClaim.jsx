@@ -1,77 +1,137 @@
-// src/pages/ReviewClaim.jsx
-import React, { useState, useEffect } from "react";
+// src/pages/ClaimReview.jsx
+import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 
-const ReviewClaim = () => {
+const ClaimReview = () => {
   const { id } = useParams();
   const navigate = useNavigate();
+
   const [claim, setClaim] = useState(null);
   const [verdict, setVerdict] = useState("");
-  const [sources, setSources] = useState("");
+  const [sources, setSources] = useState([""]);
+  const [notes, setNotes] = useState("");
+  const [evidence, setEvidence] = useState(null);
 
   useEffect(() => {
-    const fetchClaim = async () => {
-      const res = await fetch(`http://localhost:5000/api/claims/${id}`);
-      const data = await res.json();
-      setClaim(data);
-    };
-    fetchClaim();
+    // Placeholder: replace with actual fetch logic
+    setClaim({
+      id,
+      text: "COVID-19 vaccines contain microchips.",
+      submittedBy: "user@example.com",
+      date: "2025-06-27",
+    });
   }, [id]);
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    const res = await fetch(`http://localhost:5000/api/claims/${id}/verdict`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ verdict, sources }),
-    });
-
-    if (res.ok) {
-      alert("Verdict submitted");
-      navigate("/dashboard/reviewer");
-    } else {
-      alert("Failed to submit verdict");
-    }
+  const handleAddSource = () => {
+    setSources([...sources, ""]);
   };
 
-  if (!claim) return <p>Loading...</p>;
+  const handleSourceChange = (index, value) => {
+    const updated = [...sources];
+    updated[index] = value;
+    setSources(updated);
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    const formData = {
+      verdict,
+      notes,
+      sources: sources.filter((s) => s.trim() !== ""),
+      evidence, // This would be sent as a file upload
+    };
+    console.log("Review Submitted:", formData);
+    alert("Review submitted (mock)");
+    navigate("/factchecker"); // Redirect after submission
+  };
+
+  if (!claim) return <p className="text-center p-10">Loading claim...</p>;
 
   return (
-    <div className="p-6">
-      <h1 className="text-2xl font-bold mb-4">{claim.title}</h1>
-      <p className="mb-4">{claim.content}</p>
+    <div className="max-w-4xl mx-auto p-6">
+      <h1 className="text-2xl font-bold mb-4 text-blue-800">Review Claim</h1>
 
-      <form onSubmit={handleSubmit} className="space-y-4">
-        <select
-          value={verdict}
-          onChange={(e) => setVerdict(e.target.value)}
-          required
-          className="w-full p-2 border rounded"
-        >
-          <option value="">Select Verdict</option>
-          <option value="true">True</option>
-          <option value="false">False</option>
-          <option value="misleading">Misleading</option>
-          <option value="commentary">Commentary</option>
-        </select>
+      <div className="bg-white shadow rounded p-4 mb-6">
+        <p className="text-lg font-medium text-gray-800">{claim.text}</p>
+        <p className="text-sm text-gray-500 mt-2">
+          Submitted by: {claim.submittedBy} on {claim.date}
+        </p>
+      </div>
 
-        <textarea
-          placeholder="Sources / Notes"
-          value={sources}
-          onChange={(e) => setSources(e.target.value)}
-          className="w-full p-2 border rounded"
-          rows="4"
-        />
+      <form onSubmit={handleSubmit} className="space-y-6 bg-white shadow rounded p-6">
+        {/* Verdict */}
+        <div>
+          <label className="block font-medium mb-1 text-gray-700">Verdict</label>
+          <select
+            className="w-full border p-2 rounded"
+            value={verdict}
+            onChange={(e) => setVerdict(e.target.value)}
+            required
+          >
+            <option value="">Select a verdict</option>
+            <option>True</option>
+            <option>False</option>
+            <option>Misleading</option>
+            <option>Satire</option>
+            <option>Commentary</option>
+          </select>
+        </div>
 
+        {/* Sources */}
+        <div>
+          <label className="block font-medium mb-1 text-gray-700">Sources</label>
+          {sources.map((source, idx) => (
+            <input
+              key={idx}
+              type="url"
+              placeholder="https://example.com"
+              value={source}
+              onChange={(e) => handleSourceChange(idx, e.target.value)}
+              className="w-full border p-2 rounded mb-2"
+            />
+          ))}
+          <button type="button" onClick={handleAddSource} className="text-blue-600 text-sm">
+            + Add another source
+          </button>
+        </div>
+
+        {/* Notes */}
+        <div>
+          <label className="block font-medium mb-1 text-gray-700">Reviewer Notes</label>
+          <textarea
+            rows="4"
+            className="w-full border p-2 rounded"
+            placeholder="Add your explanation here..."
+            value={notes}
+            onChange={(e) => setNotes(e.target.value)}
+          />
+        </div>
+
+        {/* Evidence Upload */}
+        <div>
+          <label className="block font-medium mb-1 text-gray-700">Upload Evidence (Optional)</label>
+          <input
+            type="file"
+            accept="image/*,application/pdf"
+            onChange={(e) => setEvidence(e.target.files[0])}
+          />
+          {evidence && (
+            <p className="text-sm text-green-700 mt-1">
+              Attached: {evidence.name}
+            </p>
+          )}
+        </div>
+
+        {/* Submit */}
         <button
           type="submit"
-          className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+          className="bg-blue-700 text-white px-4 py-2 rounded hover:bg-blue-800"
         >
-          Submit Verdict
+          Submit Review
         </button>
       </form>
     </div>
   );
 };
 
-export default ReviewClaim;
+export default ClaimReview;

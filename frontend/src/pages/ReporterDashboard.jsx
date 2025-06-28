@@ -92,6 +92,22 @@ const ReporterDashboard = () => {
     setEditingDraft(null);  
   };
 
+  const handleSend = async () => {
+    if(!title.trim()) return;
+
+    try{
+      await handleSave();
+
+
+
+      console.log('Article sent successfully');
+    
+    } catch (error) {
+      console.error('Failed to send  article:', error);
+    }
+
+  };
+
   const handleDelete = async (id) => {
     try{
       await axios.delete(`http://localhost:5000/api/drafts/${id}`);
@@ -228,12 +244,21 @@ const ReporterDashboard = () => {
             )}
           </div> 
 
+          {/*Two button layout*/}         
+          <div className='flex gap-3 mt-4'>
+
           <button
             onClick={handleSave}
-            className="w-full bg-blue-700 text-white py-2 rounded mt-4"
+            className="flex-1 bg-blue-700 text-white py-2 rounded hover:bg-blue-800 transition-colors"
           >
            {isEditing ? 'Update Article' : 'Save Article'}         
           </button>
+          <button onClick={handleSend}
+          className="flex-1 bg-green-600 text-white py-2 rounded hover:bg-green-700 transition-colors"
+          >
+            Send Article
+          </button>
+          </div>
         </div>
 
           </Modal>

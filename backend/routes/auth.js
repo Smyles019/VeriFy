@@ -3,6 +3,7 @@ import bcrypt from "bcrypt";
 import User from "../models/User.js";
 import crypto from "crypto";
 import sendEmail from "../utils/sendEmail.js";
+import jwt from "jsonwebtoken";
 import {
   forgotPassword,
   resetPassword
@@ -18,7 +19,7 @@ router.get("/test", (req, res) => {
 
 router.post("/register", async (req, res) => {
   try {
-    const { firstName, lastName, email, phone, password } = req.body;
+    const { firstName, lastName, email, phone, password, role } = req.body;
 
      const existingUser = await User.findOne({ email });
     if (existingUser) {
@@ -28,7 +29,7 @@ router.post("/register", async (req, res) => {
     const saltRounds = 10;
     const hashedPassword = await bcrypt.hash(password, saltRounds);
 
-    const newUser = new User({ firstName, lastName, email, phone, password: hashedPassword });
+    const newUser = new User({ firstName, lastName, email, phone, password: hashedPassword, role: role || "reader" }); // Default role is 'reader'
 
   
     await newUser.save();
@@ -57,7 +58,24 @@ router.post("/login", async (req, res) => {
       return res.status(401).json({ message: "Incorrect password" });
     }
 
-    res.status(200).json({ message: "Login successful" });
+     const token = jwt.sign(
+      { id: user._id, role: user.role },
+      process.env.JWT_SECRET || "yourSecretKey", // Use env variable in prod
+      { expiresIn: "1d" }
+    );
+
+    // Return user + token
+    res.status(200).json({
+      message: "Login successful",
+      token,
+      user: {
+        id: user._id,
+        email: user.email,
+        role: user.role, // This is what frontend uses to redirect
+        firstName: user.firstName,
+        lastName: user.lastName,
+      },
+    });
   } catch (error) {
     res.status(500).json({ message: "Login failed", error: error.message });
   }

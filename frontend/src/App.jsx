@@ -11,6 +11,7 @@ import ForgotPassword from "./pages/ForgotPassword"
 import ResetPassword from "./pages/ResetPassword"
 import FactCheckerDashboard from './pages/FactCheckerDashboard'
 import ReviewClaim from './pages/ReviewClaim'
+import AdminDashboard from './pages/AdminDashboard'
 
 
 const Home = () => (
@@ -37,6 +38,7 @@ const App = () => {
         <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/reset-password/:token" element={<ResetPassword />} />
         <Route path="/factcheckerdashboard" element={<FactCheckerDashboard />} />
+        <Route path="/admindashboard" element={<AdminDashboard />} />
         <Route path="/reviewclaim" element={<ReviewClaim />} />
 
 

@@ -1,80 +1,109 @@
 // src/pages/FactCheckerDashboard.jsx
-import { useEffect, useState } from "react";
+import { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
+import Sidebar from "../components/Sidebar";
+import { FaBars } from "react-icons/fa";
 
 const FactCheckerDashboard = () => {
   const [claims, setClaims] = useState([]);
+  const [isSidebarOpen, setSidebarOpen] = useState(false);
+
+  const toggleSidebar = () => setSidebarOpen((prev) => !prev);
 
   useEffect(() => {
     const fetchClaims = async () => {
-      const res = await fetch("http://localhost:5000/api/claims/pending");
-      const data = await res.json();
-      setClaims(data);
+      try {
+        const res = await fetch("http://localhost:5000/api/claims/pending");
+        const data = await res.json();
+        setClaims(data);
+      } catch (error) {
+        console.error("Failed to fetch claims:", error);
+      }
     };
 
     fetchClaims();
   }, []);
 
   return (
-    <div className="flex min-h-screen">
+    <div className="relative min-h-screen bg-gray-100 font-sans">
       {/* Sidebar */}
-      <div className="w-64 bg-blue-800 text-white p-6 space-y-6">
-        <img src="/assets/logo.png" alt="Logo" className="w-12 h-12 mx-auto" />
-        <nav className="flex flex-col gap-4 mt-4 font-medium">
-          <a href="#" className="hover:underline">Home</a>
-          <a href="#" className="hover:underline">Claims</a>
-          <a href="#" className="hover:underline">Profile</a>
-          <a href="#" className="hover:underline">Log Out</a>
-        </nav>
-      </div>
+      <Sidebar isOpen={isSidebarOpen} onClose={() => setSidebarOpen(false)} />
 
-      {/* Main Area */}
-      <div className="flex-1 bg-gray-100">
-        {/* Top Navbar */}
-        <div className="bg-blue-800 text-white py-3 px-6 flex justify-between items-center">
-          <h1 className="text-2xl font-bold">VeriFy</h1>
-          {/* Removed subscribe and sign in */}
-          <div></div>
-        </div>
+      {/* Toggle Button */}
+      <button
+        onClick={toggleSidebar}
+        className="text-blue-800 text-2xl m-4 focus:outline-none"
+      >
+        <FaBars />
+      </button>
 
-        {/* Category Links */}
-        <div className="bg-gray-100 border-b text-sm px-6 py-2 flex gap-6 font-semibold">
-          <a href="#" className="hover:underline">LATEST</a>
-          <a href="#" className="hover:underline">POLITICS</a>
-          <a href="#" className="hover:underline">HEALTH</a>
-          <a href="#" className="hover:underline">BUSINESS</a>
-          <a href="#" className="hover:underline">ENTERTAINMENT</a>
-          <a href="#" className="hover:underline">SPORTS</a>
-        </div>
+      {/* Main Content */}
+      <main
+  className={`transition-all duration-300 ${
+    isSidebarOpen ? "ml-64" : "ml-0"
+  } p-6 bg-blue-50 min-h-screen`}
+>
+  <div className="flex flex-col lg:flex-row gap-6">
+    {/* Left Section */}
+    <div className="flex-1 space-y-6">
+      
+      {/* 🔷 Current Claims */}
+      <div className="bg-blue-100 p-6 rounded shadow">
+        <h2 className="text-xl font-semibold mb-4">Current claims</h2>
 
-        {/* Main Content */}
-        <div className="p-6">
-          <div className="flex justify-between items-center mb-6">
-            <h2 className="text-xl font-bold">Claims to Review</h2>
-          </div>
-
-          {claims.length === 0 ? (
-            <p className="text-gray-600">No claims pending review.</p>
-          ) : (
-            <div className="space-y-4">
-              {claims.map((claim) => (
-                <div
-                  key={claim._id}
-                  className="bg-blue-100 px-4 py-3 rounded flex justify-between items-center"
-                >
-                  <div>
-                    <p className="font-medium">{claim.text}</p>
-                    <p className="text-sm text-gray-600">Submitted by: {claim.userEmail}</p>
-                  </div>
-                  <div className="space-x-3">
-                    <button className="text-blue-800 hover:text-blue-900">✏️ Review</button>
-                    <button className="text-red-600 hover:text-red-800">🗑️ Dismiss</button>
-                  </div>
-                </div>
-              ))}
+        {claims.length === 0 ? (
+          <p className="text-gray-500">No current claims available.</p>
+        ) : (
+          claims.slice(0, 2).map((claim, index) => (
+            <div key={claim._id || index} className="flex justify-between items-center mb-2">
+              <p>{claim.text}</p>
+              <span className={`px-3 py-1 text-sm rounded-full ${
+                index === 0
+                  ? "bg-yellow-200 text-yellow-800"
+                  : "bg-orange-100 text-orange-800"
+              }`}>
+                {index === 0 ? "Researching" : "Awaiting final verdict"}
+              </span>
             </div>
-          )}
+          ))
+        )}
+      </div>
+
+      {/* 🟩 Reviewed Claims */}
+      <div className="bg-blue-200 p-6 rounded shadow">
+        <h2 className="text-xl font-semibold text-green-800 mb-4">Reviewed claims</h2>
+
+        {[...Array(4)].map((_, i) => (
+          <div key={i} className="flex items-center gap-2 mb-2">
+            <span className="text-green-600 text-xl">✔️</span>
+            <p>Claim finished review and submitted verdict on ...</p>
+          </div>
+        ))}
+
+        <div className="text-center mt-4">
+          <button className="bg-blue-700 text-white px-4 py-2 rounded hover:bg-blue-800">
+            Load more
+          </button>
         </div>
       </div>
+    </div>
+
+    {/* 🔔 New Claims Notification Panel */}
+    <div className="w-full lg:w-[300px] bg-blue-800 text-white p-6 rounded-2xl shadow">
+      <div className="flex items-center gap-2 mb-4">
+        <span className="text-2xl">🔔</span>
+        <h2 className="text-xl font-semibold">New Claims</h2>
+      </div>
+
+      <ul className="list-disc ml-6 space-y-2">
+        <li>Claim submitted on ...</li>
+        <li>Claim submitted on ...</li>
+        <li>Claim submitted on ...</li>
+        <li>Claim submitted on ...</li>
+      </ul>
+    </div>
+  </div>
+</main>
     </div>
   );
 };

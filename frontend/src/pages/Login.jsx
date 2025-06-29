@@ -1,12 +1,8 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Link } from "react-router-dom";
 
-
-
-
 const Login = () => {
-
   const navigate = useNavigate();
 
   const [formData, setFormData] = useState({ email: "", password: "" });
@@ -30,15 +26,30 @@ const Login = () => {
 
       const data = await res.json();
       if (res.ok) {
+        const { token, user } = data;
+
+        localStorage.setItem("token", token);
+        localStorage.setItem("user", JSON.stringify(user));
+        window.dispatchEvent(new Event("login"));
         alert("Logged in successfully!");
-        navigate("/reporterdashboard");
+
+        switch (user.role) {
+          case "admin": navigate("/adminDashboard"); break;
+          case "reporter": navigate("/reporterDashboard"); break;
+          case "fact-checker": navigate("/factcheckerDashboard"); break;
+          case "editor": navigate("/editorDashboard"); break;
+          default: navigate("/readerDashboard"); break;
+        }
       } else {
-        alert(data.message);
+        alert(data.message || "Login failed");
       }
     } catch (err) {
       alert("Error: " + err.message);
     }
   };
+
+  // ... rest of your JSX (unchanged)
+
 
   
   return (

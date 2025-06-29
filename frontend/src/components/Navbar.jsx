@@ -1,31 +1,102 @@
-import { Link } from "react-router-dom";
-import logo from '../assets/logo.png'
+import { useEffect, useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { FaUserCircle } from "react-icons/fa";
+import logo from "../assets/logo.png";
 
 const Navbar = () => {
+  const [user, setUser] = useState(null);
+  const navigate = useNavigate();
 
-    return (
+  useEffect(() => {
+    const storedUser = localStorage.getItem("user");
+    if (storedUser) {
+      setUser(JSON.parse(storedUser));
+    }
+
+    const handleLogin = () => {
+      const updated = localStorage.getItem("user");
+      if (updated) setUser(JSON.parse(updated));
+    };
+
+    window.addEventListener("login", handleLogin);
+    return () => window.removeEventListener("login", handleLogin);
+  }, []);
+
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
+    setUser(null);
+    navigate("/login");
+  };
+
+  const goToDashboard = () => {
+    switch (user?.role) {
+      case "admin":
+        navigate("/admin");
+        break;
+      case "reporter":
+        navigate("/reporter");
+        break;
+      case "fact-checker":
+        navigate("/fact-checker");
+        break;
+      case "editor":
+        navigate("/editor");
+        break;
+      default:
+        navigate("/reader");
+    }
+  };
+
+
+  return (
     <>
       {/* Top blue section */}
       <nav className="bg-blue-800 text-white px-6 py-4 flex justify-between items-center">
-        {/*Left: Logo*/}
-        <div className="flex items-center space-x-4">  
-          <img className='w-12'src={logo}/>    
+        {/* Left: Logo */}
+        <div className="flex items-center space-x-4">
+          <img className="w-12" src={logo} alt="logo" />
         </div>
 
-        {/*Center: Title */}
-         <h1 className="absolute left-1/2 transform -translate-x-1/2 text-xl font-bold">VeriFy</h1>
+        {/* Center: Title */}
+        <h1 className="absolute left-1/2 transform -translate-x-1/2 text-xl font-bold">
+          VeriFy
+        </h1>
 
-         {/*Right: Search sign in, subscribe */}
+        {/* Right: Search + Auth buttons */}
         <div className="flex items-center space-x-4">
           <input
             type="text"
             placeholder="Search"
             className="rounded-md px-3 py-1 text-black focus:outline-none"
           />
-          <Link to="/register">
-          <button className="bg-black text-white px-4 py-1 rounded">Subscribe</button>
-          </Link>
-          <Link to="/login" className="underline">Sign in</Link>
+
+          {user ? (
+            <>
+              <FaUserCircle
+                title={`Logged in as ${user.role}`}
+                className="text-2xl cursor-pointer hover:text-gray-300"
+                onClick={goToDashboard}
+              />
+              <button
+                onClick={handleLogout}
+                className="bg-black text-white px-4 py-1 rounded hover:bg-gray-900"
+              >
+                Logout
+              </button>
+            </>
+          ) : (
+            <>
+              <Link to="/register">
+                <button className="bg-black text-white px-4 py-1 rounded">
+                  Subscribe
+                </button>
+              </Link>
+              <Link to="/login" className="underline">
+                Sign in
+              </Link>
+            </>
+          )}
         </div>
       </nav>
 
@@ -39,9 +110,7 @@ const Navbar = () => {
         <Link to="/sports">SPORTS</Link>
       </div>
     </>
-  ) 
-    
+  );
+};
 
-}
-
-export default Navbar
+export default Navbar;

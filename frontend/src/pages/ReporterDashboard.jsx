@@ -92,6 +92,22 @@ const ReporterDashboard = () => {
     setEditingDraft(null);  
   };
 
+  const handleSend = async () => {
+    if(!title.trim()) return;
+
+    try{
+      await handleSave();
+
+
+
+      console.log('Article sent successfully');
+    
+    } catch (error) {
+      console.error('Failed to send  article:', error);
+    }
+
+  };
+
   const handleDelete = async (id) => {
     try{
       await axios.delete(`http://localhost:5000/api/drafts/${id}`);
@@ -203,48 +219,46 @@ const ReporterDashboard = () => {
 
           {image && <img src={image} alt='Preview' className='h-32 mt-2 object-cover rounded'/>}
 
-          <div className='flex items-center flex-wrap gap-2 mt-2'>
-            {tags.map((tag, i) => (
-              <span
-                key={i}
-                className="bg-blue-200 px-2 py-1 rounded-full text-sm flex items-center"
-              >
-                #{tag}
-                <button
-                  onClick={() => setTags(tags.filter((_, index) => index !==i))}
-                  className='ml-2 text-red-600 font-bold'                  
-                >
-                  x
-                </button>
-              </span>            
-          ))}
-          <input 
-            type='text'
-            placeholder='Add Tags'
-            value={newTag}
-            onChange={e => setNewTag(e.target.value)}  
-            className='border px-2 py-1 rounded'                
-          />
+          <div className='space-y-2'>
+            <label className='block text-sm font-medium text-gray-700'>Category</label>
+            <select
+              value={tags[0] || ''}
+              onChange={(e) => setTags(e.target.value ? [e.target.value] : [])}
+              className='w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500'
+            >
+              <option value="">Select category</option>
+              <option value="Latest">Latest</option>
+              <option value="Politics">Politics</option>
+              <option value="Health">Health</option>
+              <option value="Business">Business</option>
+              <option value="Entertainment">Entertainment</option>
+              <option value="Sports">Sports</option>
+            </select>
+            
+            {tags.length > 0 && (
+              <div className='flex items-center gap-2'>
+                <span className="bg-blue-200 px-3 py-1 rounded-full text-sm">
+                  {tags[0]}
+                </span>
+              </div>
+            )}
+          </div> 
 
-          <button 
-               onClick={() => {
-                if (newTag.trim()) {
-                  setTags([...tags, newTag.trim()]);
-                  setNewTag("");
-                }
-              }}
-              className="px-2 py-1 bg-blue-600 text-white rounded"    
-          >
-            +
-          </button>
-          </div>
+          {/*Two button layout*/}         
+          <div className='flex gap-3 mt-4'>
 
           <button
             onClick={handleSave}
-            className="w-full bg-blue-700 text-white py-2 rounded mt-4"
+            className="flex-1 bg-blue-700 text-white py-2 rounded hover:bg-blue-800 transition-colors"
           >
-           {isEditing ? 'Update Artilce' : 'Save Article'}         
+           {isEditing ? 'Update Article' : 'Save Article'}         
           </button>
+          <button onClick={handleSend}
+          className="flex-1 bg-green-600 text-white py-2 rounded hover:bg-green-700 transition-colors"
+          >
+            Send Article
+          </button>
+          </div>
         </div>
 
           </Modal>

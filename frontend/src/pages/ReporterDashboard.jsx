@@ -17,6 +17,7 @@ const ReporterDashboard = () => {
   const [tags, setTags] = useState([]);
   const [newTag, setNewTag] = useState("");
   const [image, setImage] = useState(null);
+  const [reporterName, setReporterName] = useState("");
 
   //State for editing drafts
   const [editingDraft, setEditingDraft] = useState(null);
@@ -26,6 +27,9 @@ const ReporterDashboard = () => {
     axios.get("http://localhost:5000/api/drafts")
        .then(res => setDrafts(res.data))
        .catch(err => console.error(err));
+
+      const currentUser = localStorage.getItem('reporterName') || 'John Doe';
+      setReporterName(currentUser);
   }, []);
 
   //Function to open modal for new article
@@ -56,8 +60,9 @@ const ReporterDashboard = () => {
     setImage(null);
   };
 
-  const handleSave = async () => {
-    if(!title.trim()) return;   
+  const handleSaveDraft = async () => {
+    if(!title.trim()) return;
+
     try{
       if(isEditing && editingDraft){
       
@@ -92,20 +97,43 @@ const ReporterDashboard = () => {
     setEditingDraft(null);  
   };
 
-  const handleSend = async () => {
+  const handleSendDraft = async () => {
     if(!title.trim()) return;
 
-    try{
-      await handleSave();
+      try{
 
+       const articleData = {
+        title,
+        content,
+        tags,
+        image,
+        submittedBy: reporterName,
+        submittedAt: new Date().toISOString(),
+        status: 'pending_review' 
+     };
 
+     //Send draft to editor as article
+     const response = await axios.post('http://localhost:5000/api/articles', articleData);
 
-      console.log('Article sent successfully');
-    
+     if(response.status === 200 || response.status === 201){
+        //Show success message
+        alert('Draft sent successfully');
+        
+        //Close modal and reset form
+        setModalOpen(false);
+        clearForm();
+        setIsEditing(false);
+        setEditingDraft(null);
+
+        //Remove from drafts if it's an existing draft
+        if(isEditing && editingDraft){
+          setDrafts(drafts.filter(d => d._id !== editingDraft._id));
+        }        
+     }
     } catch (error) {
-      console.error('Failed to send  article:', error);
+      console.error('Failed to send draft:', error);
+      alert('Failed to send draft. Please try again.');
     }
-
   };
 
   const handleDelete = async (id) => {

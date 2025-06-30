@@ -5,6 +5,8 @@ import dotenv from "dotenv";
 import authRoutes from "./routes/auth.js";
 import Drafts from "./models/Drafts.js";
 import adminRoutes from './routes/adminRoutes.js';
+import userRoutes from "./routes/userRoutes.js";
+
 
 
 dotenv.config();
@@ -17,7 +19,7 @@ app.use(express.json());
 
 app.use("/api/auth", authRoutes);
 app.use("/api/admin", adminRoutes); 
-
+app.use("/api/users", userRoutes);
 
 app.get('/api/drafts', async (req, res) => {
   const drafts = await Drafts.find();

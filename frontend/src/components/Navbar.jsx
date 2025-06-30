@@ -4,28 +4,37 @@ import { FaUserCircle } from "react-icons/fa";
 import logo from "../assets/logo.png";
 
 const Navbar = () => {
-  const [user, setUser] = useState(null);
+  const [isLoggedIn, setIsLoggedIn] = useState(false); 
   const navigate = useNavigate();
+  const [user, setUser] = useState(null);
 
   useEffect(() => {
-    const storedUser = localStorage.getItem("user");
-    if (storedUser) {
-      setUser(JSON.parse(storedUser));
-    }
+    const checkAuth = () => {
+    const token = localStorage.getItem("token");
+    const userData = localStorage.getItem("user");
 
-    const handleLogin = () => {
-      const updated = localStorage.getItem("user");
-      if (updated) setUser(JSON.parse(updated));
+    setIsLoggedIn(!!token && !!userData);
+    setUser(userData ? JSON.parse(userData) : null);
+  };
+
+    checkAuth(); // Initial check on load
+
+    // Listen for changes
+    window.addEventListener("storage", checkAuth);
+    window.addEventListener("login", checkAuth);
+    window.addEventListener("logout", checkAuth);
+
+    return () => {
+      window.removeEventListener("storage", checkAuth);
+      window.removeEventListener("login", checkAuth);
+      window.removeEventListener("logout", checkAuth);
     };
-
-    window.addEventListener("login", handleLogin);
-    return () => window.removeEventListener("login", handleLogin);
   }, []);
 
   const handleLogout = () => {
     localStorage.removeItem("token");
     localStorage.removeItem("user");
-    setUser(null);
+    window.dispatchEvent(new Event("logout"));
     navigate("/login");
   };
 
@@ -71,22 +80,50 @@ const Navbar = () => {
             className="rounded-md px-3 py-1 text-black focus:outline-none"
           />
 
-          {user ? (
-            <>
-              <FaUserCircle
-                title={`Logged in as ${user.role}`}
-                className="text-2xl cursor-pointer hover:text-gray-300"
-                onClick={goToDashboard}
-              />
-              <button
-                onClick={handleLogout}
-                className="bg-black text-white px-4 py-1 rounded hover:bg-gray-900"
-              >
-                Logout
-              </button>
-            </>
-          ) : (
-            <>
+          {isLoggedIn ? (
+  <>
+    <FaUserCircle
+      title={user?.firstName || "Account"}
+      className="text-2xl cursor-pointer hover:text-gray-300"
+      onClick={() => {
+  const user = JSON.parse(localStorage.getItem("user"));
+
+  if (user?.role) {
+    switch (user.role) {
+      case "admin":
+        navigate("/adminDashboard");
+        break;
+      case "reporter":
+        navigate("/reporterDashboard");
+        break;
+      case "fact-checker":
+        navigate("/factcheckerDashboard");
+        break;
+      case "editor":
+        navigate("/editorDashboard");
+        break;
+      default:
+        navigate("/readerDashboard");
+    }
+  } else {
+    navigate("/login");
+  }
+}}
+    />
+    <button
+      onClick={() => {
+        localStorage.removeItem("token");
+        localStorage.removeItem("user");
+        window.dispatchEvent(new Event("logout"));
+        navigate("/login");
+      }}
+      className="bg-black text-white px-4 py-1 rounded hover:bg-gray-900"
+    >
+      Logout
+    </button>
+  </>
+) : (
+  <>
               <Link to="/register">
                 <button className="bg-black text-white px-4 py-1 rounded">
                   Subscribe

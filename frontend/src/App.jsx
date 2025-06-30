@@ -12,6 +12,7 @@ import ResetPassword from "./pages/ResetPassword"
 import FactCheckerDashboard from './pages/FactCheckerDashboard'
 import ReviewClaim from './pages/ReviewClaim'
 import AdminDashboard from './pages/AdminDashboard'
+import UserProfile from './components/UserProfile'
 
 
 const Home = () => (
@@ -40,6 +41,7 @@ const App = () => {
         <Route path="/factcheckerdashboard" element={<FactCheckerDashboard />} />
         <Route path="/admindashboard" element={<AdminDashboard />} />
         <Route path="/reviewclaim" element={<ReviewClaim />} />
+        <Route path="/userprofile" element={<UserProfile />} />
 
 
   

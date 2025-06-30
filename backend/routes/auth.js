@@ -74,6 +74,8 @@ router.post("/login", async (req, res) => {
         role: user.role, // This is what frontend uses to redirect
         firstName: user.firstName,
         lastName: user.lastName,
+        phone: user.phone,
+        createdAt: user.createdAt,
       },
     });
   } catch (error) {

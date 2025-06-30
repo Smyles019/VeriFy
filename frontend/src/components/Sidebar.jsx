@@ -17,7 +17,7 @@ const Sidebar = ({ isOpen, onClose }) => {
       <ul className="p-4 space-y-4">
         <li><a href="/" className="text-blue-700 hover:underline">Home</a></li>
         <li><a href="/factcheckerdashboard" className="text-blue-700 hover:underline">Account</a></li>
-        <li><a href="/claims" className="text-blue-700 hover:underline">Claims</a></li>
+        <li><a href="/reviewclaim" className="text-blue-700 hover:underline">Claims</a></li>
         <li><a href="/settings" className="text-blue-700 hover:underline">Settings</a></li>
         <li><a href="/logout" className="text-blue-700 hover:underline">Logout</a></li>
         <li><a href="/help" className="text-blue-700 hover:underline">Help</a></li>

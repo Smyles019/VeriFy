@@ -21,7 +21,7 @@ const articleSchema = new mongoose.Schema({
 //Index for better query performance
 articleSchema.index({ submittedAt: -1 });
 articleSchema.index({ status: 1 });
-articleSchema.indec({ submittedBy: 1});
+articleSchema.index({ submittedBy: 1});
 
 const Article = mongoose.model('Article', articleSchema);
 

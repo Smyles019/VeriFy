@@ -7,7 +7,6 @@ import axios from 'axios'
 import logo from '../assets/logo.png'
 import { Link } from 'react-router-dom';
 
-
 const ReporterDashboard = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
@@ -276,12 +275,12 @@ const ReporterDashboard = () => {
           <div className='flex gap-3 mt-4'>
 
           <button
-            onClick={handleSave}
+            onClick={handleSaveDraft}
             className="flex-1 bg-blue-700 text-white py-2 rounded hover:bg-blue-800 transition-colors"
           >
            {isEditing ? 'Update Article' : 'Save Article'}         
           </button>
-          <button onClick={handleSend}
+          <button onClick={handleSendDraft}
           className="flex-1 bg-green-600 text-white py-2 rounded hover:bg-green-700 transition-colors"
           >
             Send Article
@@ -294,6 +293,5 @@ const ReporterDashboard = () => {
     </div>
   );
 };
-
 
 export default ReporterDashboard

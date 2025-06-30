@@ -49,7 +49,7 @@ const EditorDashboard = () => {
       });
 
       //Update local state
-      setArticles(articles.map(
+      setArticles(articles.map(article =>
         article._id === articleId ? {...article, status: 'approved'} : article       
       ));
 
@@ -58,6 +58,24 @@ const EditorDashboard = () => {
         console.error('Failed to approve article:', error);
         alert('Failed to approve article');
     }
+  };
+
+  const handleRejectArticle = async (articleId) => {
+     try{
+       await axios.put(`http://localhost:5000/api/articles/${articleId}/status`, {
+          status: 'rejected'
+       }); 
+
+       //Update local state
+       setArticles(articles.map(article =>
+          article._id === articleId ? {...article, status: 'rejected'} : article
+       ));
+
+       alert ('Article rejected');
+     } catch (error){
+        console.error('Failed to reject article:', error);
+        alert('Failed to reject article');
+     }
   };
 
   const formatDateTime = (dateString) => {
@@ -223,9 +241,7 @@ const EditorDashboard = () => {
           </div>
         </main>
       </div>
-    </div>
-               
- 
+    </div>               
   );
 };
 

@@ -4,10 +4,8 @@ import cors from "cors";
 import dotenv from "dotenv";
 import authRoutes from "./routes/auth.js";
 import Drafts from "./models/Drafts.js";
+import Article from "./models/Article.js";
 import adminRoutes from './routes/adminRoutes.js';
-import userRoutes from "./routes/userRoutes.js";
-
-
 
 dotenv.config();
 const app = express();
@@ -16,14 +14,17 @@ const PORT = process.env.PORT || 5000;
 app.use(cors());
 app.use(express.json());
 
-
 app.use("/api/auth", authRoutes);
 app.use("/api/admin", adminRoutes); 
-app.use("/api/users", userRoutes);
 
 app.get('/api/drafts', async (req, res) => {
-  const drafts = await Drafts.find();
+  try{
+  const drafts = await Drafts.find().sort({ createdAt: -1 });
   res.json(drafts);
+ } catch (error){
+  console.error('Error fetching drafts:', error);
+  res.status(500).json({ error: 'Failed to fetch drafts' });
+ }
 });
 
 app.post('/api/drafts', async (req, res) => {
@@ -39,15 +40,133 @@ app.post('/api/drafts', async (req, res) => {
 });
 
 app.put('/api/drafts/:id', async (req, res) => {
+  try{
   const updated = await Drafts.findByIdAndUpdate(req.params.id, req.body, { new: true });
+  if (!updated){
+    return res.status(404).json({ error: 'Draft not found' });
+  }
   res.json(updated);
+} catch (error){
+  console.error('Error updating draft:', error);
+  res.status(500).json({error: 'Failed to update draft' });
+}
 });
 
 app.delete('/api/drafts/:id', async (req, res) => {
-  await Drafts.findByIdAndDelete(req.params.id);
+  try{
+  const deleted = await Drafts.findByIdAndDelete(req.params.id);
+  if (!deleted) {
+    return res.status(404).json({ error: 'Draft not found' });
+  }
   res.status(204).end(); 
+ } catch (error) {
+   console.error('Error deleting draft:', error);
+   res.status(500).json({ error: 'Failed to delete draft' });
+ } 
 });
 
+//Article routes for submitted drafts
+app.get('/api/artices', async (req, res) => {
+   try{
+    const articles = await Article.find().sort({ submittedAt: -1 });
+    res.json(articles);
+   } catch (error) {
+     console.error('Error fetching articles:', error);
+     res.status(500).json({ error: 'Failed to fetch articles' });
+   }
+});
+
+app.post('/api/articles', async (req, res) => {
+  console.log('Received article submission:', req.body);
+  try{
+    //creating new article from submitted draft
+    const articleData = {
+      title: req.body.title,
+      content: req.body.content,
+      tags: req.body.tags || [],
+      image: req.body.image,
+      submittedBy: req.body.submittedBy,
+      submittedAt: req.body.submittedAt || new Date(),
+      status: req.body.status || 'pending_review'
+    };
+
+    const newArticle = new Article(articleData);
+    await newArticle.save();
+    res.status(201).json(newArticle);
+  } catch (error) {
+    console.error('Error saving artice:', error);
+    res.status(500).json({ error: 'Failed to create article'});
+  }
+});
+
+app.get('/api/articles/:id', async (req, res) => {
+    try{
+    const article = await Article.findById(req.params.id);
+    if(!article){
+      return res.status(404).json({ error: 'Article not found'});      
+    }
+    res.json(article);
+  } catch (error) {
+    console.error('Error fetching article:', error);
+    res.status(500).json({ error: 'Failed to fetch article'});
+  }
+});
+
+app.put('/api/articles/:id/status', async (req, res) => {
+  try{
+    const { status } = req.body;
+    const validStatuses = ['pending_review', 'approved', 'rejected', 'published'];
+
+    if(!validStatuses.includes(status)) {
+      return res.status(400).json({ error: 'Invalid status' });
+    }
+
+    const updated = await Article.findByIdAndUpdate(
+      req.params.id, {
+        status,
+        reviewedAt: new Date()
+      },
+      { new: true }
+    );
+
+    if (!updated){
+      return res.status(404).json({ error: 'Article not found'});
+    }
+    res.json(updated);
+
+  } catch (error){
+    console.error('Error updating article status:', error);
+    res.status(500).json({ error: 'Failed to update article status'});
+  }
+});
+
+app.put('/api/articles/:id', async (req, res) => {
+  try{
+    const updated = await Article.findByIdAndUpdate(req.params.id, req.body, { new: true });
+    if (!updated){
+      return res.status(404).json({ error: 'Article not found' });  
+    }
+    res.json(updated);
+  } catch (error) {
+    console.error('Error updating article:', error);
+    res.status(500).json({ error: 'Failed to update article '});
+  }
+
+});
+
+app.delete('/api/articles/:id', async (req, res) => {
+  try{
+    const deleted = await Article.findByIdAndDelete(req.params.id);
+    if(!deleted){
+      return res.status(404).json({ error: 'Article not found' });     
+    }
+    res.status(204).end();
+
+  } catch (error) {
+    console.error('Error deleting article:', error);
+    res.status(500).json({ error: 'Failed to delete article' });
+  }
+});
 
 mongoose.connect(process.env.MONGO_URI, { useNewUrlParser: true, useUnifiedTopology: true })
   .then(() => {

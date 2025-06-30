@@ -13,6 +13,7 @@ import FactCheckerDashboard from './pages/FactCheckerDashboard'
 import ReviewClaim from './pages/ReviewClaim'
 import AdminDashboard from './pages/AdminDashboard'
 import UserProfile from './components/UserProfile'
+import EditorDashboard from './pages/EditorDashboard'
 
 
 const Home = () => (
@@ -38,6 +39,7 @@ const App = () => {
         <Route path="/reporterdashboard" element={<ReporterDashboard />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/reset-password/:token" element={<ResetPassword />} />
+        <Route path="/editordashboard" element={<EditorDashboard />} />
         <Route path="/factcheckerdashboard" element={<FactCheckerDashboard />} />
         <Route path="/admindashboard" element={<AdminDashboard />} />
         <Route path="/reviewclaim" element={<ReviewClaim />} />

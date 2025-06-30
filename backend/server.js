@@ -66,7 +66,7 @@ app.delete('/api/drafts/:id', async (req, res) => {
 });
 
 //Article routes for submitted drafts
-app.get('/api/artices', async (req, res) => {
+app.get('/api/articles', async (req, res) => {
    try{
     const articles = await Article.find().sort({ submittedAt: -1 });
     res.json(articles);

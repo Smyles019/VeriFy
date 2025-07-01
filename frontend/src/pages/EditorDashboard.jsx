@@ -1,12 +1,36 @@
 import { useState, useEffect } from "react"
-import {FaBars, FaEdit, FaEye, FaCheck, FaTimes} from 'react-icons/fa'
+import {FaBars, FaEdit, FaEye, FaCheck, FaTimes, FaSave} from 'react-icons/fa'
+import ReactQuill from "react-quill"
+import 'react-quill/dist/quill.snow.css'
 import axios from 'axios'
+import Modal from '../components/Modal'
 
 const EditorDashboard = () => {
     const [sidebarOpen, setSidebarOpen] = useState(false);
     const [articles, setArticles] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+    const [editModalOpen, setEditModalOpen] = useState(false);
+    const [viewModalOpen, setViewModalOpen] = useState(false);
+    const [currentArticle, setCurrentArticle] = useState(null);
+    const [editedContent, setEditedContent] = useState('');
+    const [editedTitle, setEditedTitle] = useState('');
+    const [saving, setSaving] = useState(false);
+
+    const quillModules = {
+      toolbar: [
+      [{ header: [1, 2, 3, false] }],
+      ['bold', 'italic', 'underline'],
+      [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+      ['link', 'image'],
+      ['clean'],
+    ] 
+    };
+
+    const quillFormats = [
+        'header', 'bold', 'italic', 'underline',
+        'list', 'bullet', 'link', 'image'
+    ];
 
     //Fetch submitted articles submitted by reporters
     useEffect(() => {
@@ -28,24 +52,31 @@ const EditorDashboard = () => {
 
         //Refresh articles every 30 seconds to get new submissions
         const interval = setInterval(fetchArticles, 30000);
-
         return () => clearInterval(interval);
     }, []);
 
     const handleViewArticle = (articleId) => {
-        console.log(`Viewing article with ID: ${articleId}`);
-        //Add view functionality
+        const article = articles.find(article => article._id === articleId);
+        if (article) {
+            setCurrentArticle(article);
+            setViewModalOpen(true);
+        }
     };
-    
+
   const handleEditArticle = (articleId) =>{
-    console.log(`Editing article with ID: ${articleId}`);
-    
+    const article = articles.find(article => article._id === articleId);
+    if (article) {
+       setCurrentArticle(article);
+       setEditedTitle(article.title);
+       setEditedContent(article.content);
+       setEditModalOpen(true);
+    }   
   };
 
   const handleApproveArticle = async (articleId) => {
     try{
       await axios.put(`http://localhost:5000/api/articles/${articleId}/status`, {
-       status: 'approved' 
+       status: 'approved', 
       });
 
       //Update local state
@@ -63,7 +94,7 @@ const EditorDashboard = () => {
   const handleRejectArticle = async (articleId) => {
      try{
        await axios.put(`http://localhost:5000/api/articles/${articleId}/status`, {
-          status: 'rejected'
+          status: 'rejected',
        }); 
 
        //Update local state
@@ -241,6 +272,93 @@ const EditorDashboard = () => {
           </div>
         </main>
       </div>
+
+      {/*View Modal*/}
+
+      {viewModalOpen && currentArticle && (
+        <Modal isOpen={viewModalOpen} onClose={() => setViewModalOpen(false)}>
+          <div className="space-y-4">
+            <h3 className="text-xl font-bold text-gray-800">{currentArticle.title}</h3>
+            <p className="text-sm text-gray-600">
+              By {currentArticle.submittedBy} on {formatDateTime(currentArticle.submittedAt || currentArticle.createdAt).date}
+            </p>
+
+            {currentArticle.tags && currentArticle.tags.length > 0 && (
+               <div className="flex gap-2 flex-wrap"> 
+                 {currentArticle.tags.map((tag, index) => (
+                  <span key={index} className="bg-blue-100 text-blue-700 px-3 py-1 rounded-full text-xs">
+                     #{tag}
+                  </span> 
+                ))}
+               </div>
+            )}
+
+            <div
+             className="prose max-w-none"
+             dangerouslySetInnerHTML={{__html: currentArticle.content || 'No content available.' }}
+            />
+          </div>
+
+        </Modal>
+      )}
+
+      {/*Edit Modal*/}
+
+      <Modal isOpen={editModalOpen} onClose={() => setEditModalOpen(false)}>
+        <div className="space-y-4">
+          <input
+             type="text"
+             value={editedTitle}
+             onChange={(e) => setEditedTitle(e.target.value)}
+             placeholder="Edit title"
+             className="w-full p-2 border rounded"
+          />   
+
+          <ReactQuill
+            value={editedContent}
+            onChange={setEditedContent}
+            modules={quillModules}
+            formats={quillFormats}
+            placeholder="Edit article content"          
+          />
+
+          <button 
+            onClick={() => setEditModalOpen(false)}
+            className="px-4 py-2 bg-gray-200 text-gray-800 rounded"
+          >
+           Cancel 
+          </button>
+
+          <button onClick={async() => {
+            if(!currentArticle) return;
+             try{
+               setSaving(true);
+               await axios.put(
+                `http://localhost:5000/api/articles/${currentArticle._id}`,
+                { title: editedTitle, content: editedContent,}
+            );
+            setArticles((prev) =>
+                prev.map((article) => 
+                  article._id === currentArticle._id
+                  ? {...article, title: editedTitle, content: editedContent} : article
+                )
+             );
+             setEditModalOpen(false);
+             alert("Article updated!");
+             } catch (error) {
+                console.error("Error updating article:", error);
+                alert("Failed to update article.");
+             } finally {
+                setSaving(false);
+             }
+          }}
+          className="px-4 py-2 bg-blue-600 text-white rounded"
+          >
+            {saving ? "Saving..." : "Save Changes"}
+          </button>
+            
+        </div> 
+      </Modal>
     </div>               
   );
 };

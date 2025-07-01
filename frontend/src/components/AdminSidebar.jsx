@@ -21,7 +21,7 @@ const AdminSidebar = ({ isOpen, toggleSidebar }) => {
         </button>
       </div>
       <nav className="p-4 flex flex-col space-y-4">
-        <Link to="/adminDashboard" className="hover:text-blue-300">Account</Link>
+        <Link to="/userprofile" className="hover:text-blue-300">Account</Link>
         <Link to="/admin/users" className="hover:text-blue-300">Users</Link>
         <Link to="/admin/claims" className="hover:text-blue-300">Claims</Link>
         <Link to="/admin/fact-checkers" className="hover:text-blue-300">Fact Checkers</Link>

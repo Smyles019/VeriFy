@@ -13,6 +13,8 @@ import FactCheckerDashboard from './pages/FactCheckerDashboard'
 import ReviewClaim from './pages/ReviewClaim'
 import AdminDashboard from './pages/AdminDashboard'
 import UserProfile from './components/UserProfile'
+import UsersTable from './components/UsersTable'
+import ClaimDetails from './pages/ClaimDetails'
 
 
 const Home = () => (
@@ -42,6 +44,9 @@ const App = () => {
         <Route path="/admindashboard" element={<AdminDashboard />} />
         <Route path="/reviewclaim" element={<ReviewClaim />} />
         <Route path="/userprofile" element={<UserProfile />} />
+        <Route path="/admin/users" element={<UsersTable />} />
+        <Route path="/claimdetails" element={<ClaimDetails />} />
+
 
 
   

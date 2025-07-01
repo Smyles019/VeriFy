@@ -10,13 +10,18 @@ const Register = () => {
   e.preventDefault();
 
   const form = e.target;
-  const data = {
-    firstName: form[0].value,
-    lastName: form[1].value,
-    email: form[2].value,
-    phone: form[3].value,
-    password: form[4].value,
-  };
+  const firstName = form[0].value.trim();
+const lastName = form[1].value.trim();
+
+const data = {
+  firstName,
+  lastName,
+  username: `${firstName}${lastName}`.toLowerCase(), // e.g., janedoe
+  email: form[2].value,
+  phone: form[3].value,
+  password: form[4].value,
+};
+
 
   try {
     const res = await fetch("http://localhost:5000/api/auth/register", {

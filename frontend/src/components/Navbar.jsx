@@ -8,6 +8,8 @@ const Navbar = () => {
   const navigate = useNavigate();
   const [user, setUser] = useState(null);
 
+  
+
   useEffect(() => {
     const checkAuth = () => {
     const token = localStorage.getItem("token");
@@ -32,11 +34,9 @@ const Navbar = () => {
   }, []);
 
   const handleLogout = () => {
-    localStorage.removeItem("token");
-    localStorage.removeItem("user");
-    window.dispatchEvent(new Event("logout"));
-    navigate("/login");
-  };
+  localStorage.removeItem('token');
+  window.location.href = '/login'; // hard reload to login page
+};
 
   const goToDashboard = () => {
     switch (user?.role) {
@@ -112,10 +112,10 @@ const Navbar = () => {
     />
     <button
       onClick={() => {
-        localStorage.removeItem("token");
-        localStorage.removeItem("user");
-        window.dispatchEvent(new Event("logout"));
-        navigate("/login");
+       localStorage.removeItem("token");
+       localStorage.removeItem("user");
+       window.dispatchEvent(new Event("logout")); // optional: for cross-tab sync
+       window.location.href = "/login";
       }}
       className="bg-black text-white px-4 py-1 rounded hover:bg-gray-900"
     >

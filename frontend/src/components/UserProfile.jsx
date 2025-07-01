@@ -1,146 +1,232 @@
-// src/pages/AccountPage.jsx
-import { useEffect, useState } from "react";
-import { FaUserCircle } from "react-icons/fa";
+import React, { useState, useRef, useEffect } from 'react';
+import { FaEdit, FaCamera } from 'react-icons/fa';
 
-const roleColors = {
-  admin: "bg-red-600",
-  reporter: "bg-blue-600",
-  "fact-checker": "bg-green-600",
-  editor: "bg-purple-600",
-  reader: "bg-gray-600",
-};
-
-const AccountPage = () => {
-  const [user, setUser] = useState(null);
+const UserProfile = () => {
+  const fileInputRef = useRef(null);
   const [editMode, setEditMode] = useState(false);
+  const [loading, setLoading] = useState(false);
+
   const [formData, setFormData] = useState({
-    firstName: "",
-    lastName: "",
-    phone: "",
+    firstName: '',
+    lastName: '',
+    email: '',
+    phone: '',
+    profilePicUrl: '',
   });
 
+  const [profilePic, setProfilePic] = useState(null);
+
+  // Fetch user data on mount
   useEffect(() => {
-    const storedUser = JSON.parse(localStorage.getItem("user"));
-    if (storedUser) {
-      setUser(storedUser);
-      setFormData({
-        firstName: storedUser.firstName || "",
-        lastName: storedUser.lastName || "",
-        phone: storedUser.phone || "",
-      });
-    }
+    const fetchUserData = async () => {
+      const token = localStorage.getItem('token');
+
+      try {
+        const response = await fetch('http://localhost:5000/api/users/me', {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+          },
+        });
+
+        if (!response.ok) throw new Error('User fetch failed');
+
+        const data = await response.json();
+
+        setFormData({
+          firstName: data.firstName || '',
+          lastName: data.lastName || '',
+          email: data.email || '',
+          phone: data.phone || '',
+          profilePicUrl: data.profilePicUrl || '',
+        });
+
+        if (data.profilePicUrl) {
+          setProfilePic(`http://localhost:5000/${data.profilePicUrl}`);
+        }
+
+      } catch (error) {
+        console.error('Error fetching user data:', error);
+      }
+    };
+
+    fetchUserData();
   }, []);
 
   const handleChange = (e) => {
-    setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
+    setFormData((prev) => ({
+      ...prev,
+      [e.target.name]: e.target.value,
+    }));
   };
 
-  const handleSave = () => {
-    const updatedUser = { ...user, ...formData };
-    localStorage.setItem("user", JSON.stringify(updatedUser));
-    setUser(updatedUser);
-    setEditMode(false);
-    alert("Profile updated (locally)!");
+  const handleImageChange = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    const imageFormData = new FormData();
+    imageFormData.append('profilePic', file);
+
+    try {
+      const response = await fetch('http://localhost:5000/api/users/upload-profile-pic', {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('token')}`,
+        },
+        body: imageFormData,
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        const fullUrl = `http://localhost:5000/${data.profilePicUrl}`;
+        setProfilePic(fullUrl);
+
+        // ✅ Update in formData so it's saved during Save
+        setFormData((prev) => ({
+          ...prev,
+          profilePicUrl: data.profilePicUrl,
+        }));
+      } else {
+        console.error('Image upload failed:', data.message);
+      }
+    } catch (err) {
+      console.error('Upload error:', err);
+    }
   };
 
-  if (!user) return <div className="p-6">Loading...</div>;
+  const removeImage = () => {
+    setProfilePic(null);
+    setFormData((prev) => ({
+      ...prev,
+      profilePicUrl: '',
+    }));
+  };
+
+  const handleSave = async () => {
+    setLoading(true);
+    const token = localStorage.getItem('token');
+
+    try {
+      const response = await fetch('http://localhost:5000/api/users/me', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
+        body: JSON.stringify(formData),
+      });
+
+      if (response.ok) {
+        setEditMode(false);
+      } else {
+        console.error('Profile update failed');
+      }
+    } catch (error) {
+      console.error('Error saving profile:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  console.log("PROFILE PIC VALUE:", profilePic);
+
 
   return (
-    <div className="max-w-3xl mx-auto my-10 bg-white p-8 rounded-lg shadow-md">
-      {/* Avatar + Role */}
-      <div className="flex flex-col items-center mb-8">
-        <div className="w-28 h-28 bg-gray-200 rounded-full flex items-center justify-center text-gray-500">
-          <FaUserCircle className="text-6xl" />
-        </div>
-        <h2 className="text-2xl font-bold mt-4">
-          {user.firstName} {user.lastName}
-        </h2>
-        <span className={`px-3 py-1 mt-2 rounded-full text-white text-sm capitalize ${roleColors[user.role] || "bg-gray-600"}`}>
-          {user.role}
-        </span>
-      </div>
+    <div className="max-w-3xl mx-auto p-6 bg-white rounded-2xl shadow-md mt-10">
+      <h2 className="text-2xl font-semibold mb-4 text-center">Account Settings</h2>
 
-      {/* Info + Edit */}
-      <div className="space-y-4">
-        <div className="flex justify-between">
-          <span className="font-medium">Email:</span>
-          <span>{user.email}</span>
-        </div>
+      {/* Profile Picture */}
+      <div className="flex flex-col items-center mb-6">
+        <div className="relative w-32 h-32 rounded-full overflow-hidden border-4 border-gray-300">
+         {profilePic ? (
+  <img
+    src={profilePic}
+    alt="Profile"
+    className="w-full h-full object-cover"
+    onError={() => setProfilePic(null)}
+  />
+) : (
+            <div className="w-full h-full flex items-center justify-center bg-gray-200 text-gray-500">
+              <FaCamera size={30} />
+            </div>
+          )}
+          <input
+            type="file"
+            accept="image/*"
+            ref={fileInputRef}
+            className="hidden"
+            onChange={handleImageChange}
+          />
+         <button
+  onClick={() => fileInputRef.current.click()}
+  className="absolute bottom-3 right-5 bg-white rounded-full p-1 shadow hover:bg-gray-100"
+  title="Change Photo"
+>
+  <FaEdit size={20} />
+</button>
 
-        {editMode ? (
-          <>
-            <div className="flex justify-between">
-              <label className="font-medium">First Name:</label>
-              <input
-                name="firstName"
-                value={formData.firstName}
-                onChange={handleChange}
-                className="border px-2 py-1 rounded text-right"
-              />
-            </div>
-            <div className="flex justify-between">
-              <label className="font-medium">Last Name:</label>
-              <input
-                name="lastName"
-                value={formData.lastName}
-                onChange={handleChange}
-                className="border px-2 py-1 rounded text-right"
-              />
-            </div>
-            <div className="flex justify-between">
-              <label className="font-medium">Phone:</label>
-              <input
-                name="phone"
-                value={formData.phone}
-                onChange={handleChange}
-                className="border px-2 py-1 rounded text-right"
-              />
-            </div>
-          </>
-        ) : (
-          <>
-            <div className="flex justify-between">
-              <span className="font-medium">Phone:</span>
-              <span>{user.phone || "-"}</span>
-            </div>
-            <div className="flex justify-between">
-              <span className="font-medium">Created:</span>
-              <span> {user.createdAt && !isNaN(new Date(user.createdAt))
-    ? new Date(user.createdAt).toDateString()
-    : "N/A"}</span>
-            </div>
-          </>
+        </div>
+        {profilePic && (
+          <button onClick={removeImage} className="mt-2 text-sm text-red-500 hover:underline">
+            Remove Photo
+          </button>
         )}
       </div>
 
-      {/* Action Buttons */}
-      <div className="mt-6 text-right">
-        {editMode ? (
+      {/* Form Inputs */}
+      <div className="space-y-4">
+        {['firstName', 'lastName', 'email', 'phone'].map((field) => (
+          <div key={field}>
+            <label className="block text-sm font-medium text-gray-700">
+              {field === 'firstName'
+                ? 'First Name'
+                : field === 'lastName'
+                ? 'Last Name'
+                : field.charAt(0).toUpperCase() + field.slice(1)}
+            </label>
+            <input
+              type="text"
+              name={field}
+              value={formData[field]}
+              disabled={!editMode}
+              onChange={handleChange}
+              className={`mt-1 block w-full p-2 rounded-md border ${
+                editMode ? 'border-gray-300' : 'border-transparent bg-gray-100'
+              }`}
+            />
+          </div>
+        ))}
+      </div>
+
+      {/* Buttons */}
+      <div className="mt-6 flex justify-center space-x-4">
+        {!editMode ? (
+          <button
+            onClick={() => setEditMode(true)}
+            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+          >
+            Edit Profile
+          </button>
+        ) : (
           <>
             <button
               onClick={handleSave}
-              className="bg-green-600 text-white px-4 py-2 rounded mr-2 hover:bg-green-700"
+              disabled={loading}
+              className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700"
             >
-              Save
+              {loading ? 'Saving...' : 'Save Changes'}
             </button>
             <button
               onClick={() => setEditMode(false)}
-              className="bg-gray-300 px-4 py-2 rounded hover:bg-gray-400"
+              className="px-4 py-2 bg-gray-400 text-white rounded-lg hover:bg-gray-500"
             >
               Cancel
             </button>
           </>
-        ) : (
-          <button
-            onClick={() => setEditMode(true)}
-            className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
-          >
-            Edit Profile
-          </button>
         )}
       </div>
     </div>
   );
 };
 
-export default AccountPage;
+export default UserProfile;

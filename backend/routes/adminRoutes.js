@@ -1,35 +1,9 @@
 import express from 'express';
 import User from '../models/User.js';
+import Article from '../models/Article.js';
 
 
 const router = express.Router()
-// GET admin stats
-router.get('/stats', async (req, res) => {
-  try {
-    const totalUsers = await User.countDocuments();
-    const totalClaims = await Claim.countDocuments();
-
-    const roleCounts = await User.aggregate([
-      { $group: { _id: "$role", count: { $sum: 1 } } }
-    ]);
-
-    const usersByRole = roleCounts.reduce((acc, item) => {
-      acc[item._id] = item.count;
-      return acc;
-    }, {});
-
-    res.json({
-      totalUsers,
-      totalClaims,
-      reporters: usersByRole.reporter || 0,
-      factCheckers: usersByRole["fact-checker"] || 0,
-    });
-  } catch (err) {
-    console.error("Failed to fetch admin stats:", err);
-    res.status(500).json({ error: 'Server Error' });
-  }
-});
-
 
 router.get('/users', async (req, res) => {
   try {
@@ -64,42 +38,15 @@ router.patch("/users/:id/role", async (req, res) => {
 });
 
 
-
-router.get('/claims', async (req, res) => {
+router.get('/articles', async (req, res) => {
   try {
-    const claims = await Claim.find().sort({ createdAt: -1 });
-    res.json(claims);
+    const articles = await Article.find().sort({ createdAt: -1 });
+    res.status(200).json(articles);
   } catch (err) {
-    console.error("Failed to fetch claims:", err);
-    res.status(500).json({ error: 'Server Error' });
+    res.status(500).json({ message: 'Failed to fetch articles', error: err.message });
   }
 });
 
-// DELETE a claim
-router.delete('/claims/:id', async (req, res) => {
-  try {
-    await Claim.findByIdAndDelete(req.params.id);
-    res.status(204).end();
-  } catch (err) {
-    console.error("Failed to delete claim:", err);
-    res.status(500).json({ error: 'Server Error' });
-  }
-});
 
-// ASSIGN a claim to a fact-checker (basic example)
-router.put('/claims/:id/assign', async (req, res) => {
-  try {
-    const { assignedTo } = req.body; // e.g., userId
-    const updatedClaim = await Claim.findByIdAndUpdate(
-      req.params.id,
-      { assignedTo },
-      { new: true }
-    );
-    res.json(updatedClaim);
-  } catch (err) {
-    console.error("Failed to assign claim:", err);
-    res.status(500).json({ error: 'Server Error' });
-  }
-});
 
 export default router;

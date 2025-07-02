@@ -19,7 +19,7 @@ router.get("/test", (req, res) => {
 
 router.post("/register", async (req, res) => {
   try {
-    const { firstName, lastName, email, phone, password, role } = req.body;
+    const { firstName, lastName, username, email, phone, password, role } = req.body;
 
      const existingUser = await User.findOne({ email });
     if (existingUser) {
@@ -29,7 +29,7 @@ router.post("/register", async (req, res) => {
     const saltRounds = 10;
     const hashedPassword = await bcrypt.hash(password, saltRounds);
 
-    const newUser = new User({ firstName, lastName, email, phone, password: hashedPassword, role: role || "reader" }); // Default role is 'reader'
+    const newUser = new User({ firstName, lastName, username, email, phone, password: hashedPassword, role: role || "reader" }); // Default role is 'reader'
 
   
     await newUser.save();

@@ -13,13 +13,7 @@ const FactCheckerDashboard = () => {
 
   useEffect(() => {
     const fetchClaims = async () => {
-      try {
-        const res = await fetch("http://localhost:5000/api/claims/pending");
-        const data = await res.json();
-        setClaims(data);
-      } catch (error) {
-        console.error("Failed to fetch claims:", error);
-      }
+      
     };
 
     fetchClaims();

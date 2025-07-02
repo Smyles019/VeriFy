@@ -6,16 +6,41 @@ import authRoutes from "./routes/auth.js";
 import Drafts from "./models/Drafts.js";
 import Article from "./models/Article.js";
 import adminRoutes from './routes/adminRoutes.js';
+import userRoutes from "./routes/userRoutes.js";
+import path from "path";
+import { fileURLToPath } from 'url';
+import { dirname } from 'path';
+
+
+
 
 dotenv.config();
 const app = express();
 const PORT = process.env.PORT || 5000;
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 
 app.use(cors());
 app.use(express.json());
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+
+
 
 app.use("/api/auth", authRoutes);
 app.use("/api/admin", adminRoutes); 
+app.use("/api/users", userRoutes);
+
+
+app.get('/api/user/:id', async (req, res) => {
+  const user = await User.findById(req.params.id);
+  res.json(user);
+});
+
+// Update a user by ID
+app.put('/api/user/:id', async (req, res) => {
+  const user = await User.findByIdAndUpdate(req.params.id, req.body, { new: true });
+  res.json(user);
+});
 
 app.get('/api/drafts', async (req, res) => {
   try{

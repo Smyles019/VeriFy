@@ -14,7 +14,9 @@ import ReviewClaim from './pages/ReviewClaim'
 import AdminDashboard from './pages/AdminDashboard'
 import UserProfile from './components/UserProfile'
 import EditorDashboard from './pages/EditorDashboard'
-
+import UsersTable from './components/UsersTable'
+import ArticleList from './components/Articlelist'
+import ClaimDetails from './pages/ClaimDetails'
 
 const Home = () => (
   <main className='px-4 md:px-12 lg:px-20'>
@@ -44,6 +46,10 @@ const App = () => {
         <Route path="/admindashboard" element={<AdminDashboard />} />
         <Route path="/reviewclaim" element={<ReviewClaim />} />
         <Route path="/userprofile" element={<UserProfile />} />
+        <Route path="/admin/users" element={<UsersTable />} />
+        <Route path="/claimdetails" element={<ClaimDetails />} />
+        <Route path="/admin/articles" element={<ArticleList />} />
+
 
 
   

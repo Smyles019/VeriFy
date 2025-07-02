@@ -19,7 +19,6 @@ const AdminSidebar = ({ isOpen, onClose }) => {
     isOpen ? 'translate-x-0' : '-translate-x-full'
   }`}
 >
-      {/* Exit Button (Sticky at top) */}
       <div className="flex justify-between items-center px-4 py-3 border-b">
         <h2 className="text-lg font-bold text-blue-800">Admin Panel</h2>
         <button

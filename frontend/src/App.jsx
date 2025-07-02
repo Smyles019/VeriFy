@@ -18,6 +18,7 @@ import EditorDashboard from './pages/EditorDashboard'
 import UsersTable from './components/UsersTable'
 import ArticleList from './components/Articlelist'
 import ClaimDetails from './pages/ClaimDetails'
+import ArticlePage from './pages/ArticlePage'
 
 const Home = () => {
   const [approvedArticles, setApprovedArticles] = useState([]);
@@ -78,11 +79,7 @@ const App = () => {
         <Route path="/admin/users" element={<UsersTable />} />
         <Route path="/claimdetails" element={<ClaimDetails />} />
         <Route path="/admin/articles" element={<ArticleList />} />
-
-
-
-  
-        
+        <Route path="/article/:id" element={<ArticlePage />} />
         <Route path="/userprofile" element={<UserProfile />} />         
       </Routes>
     

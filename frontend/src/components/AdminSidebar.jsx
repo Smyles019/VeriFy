@@ -2,30 +2,41 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import { FaTimes } from "react-icons/fa";
+import { useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { FaBars } from "react-icons/fa";
 
-const AdminSidebar = ({ isOpen, toggleSidebar }) => {
+
+const AdminSidebar = ({ isOpen, onClose }) => {
+  const navigate = useNavigate();
+    const handleLogout = () => {
+    localStorage.removeItem('token');
+    window.location.href = '/login'; // hard reload to login page
+  };
   return (
      <div
-      className={`absolute top-20 left-0 bg-blue-900 text-white w-64 z-30 transform ${
-        isOpen ? "translate-x-0" : "-translate-x-full"
-      } transition-transform duration-300 ease-in-out h-[calc(100vh-70px)] overflow-y-auto shadow-lg`}
-    >
+  className={`absolute left-0 top-0 w-64 bg-white z-40 transform transition-transform duration-300 ease-in-out h-[calc(100vh-70px)] overflow-y-auto shadow-lg ${
+    isOpen ? 'translate-x-0' : '-translate-x-full'
+  }`}
+>
       {/* Exit Button (Sticky at top) */}
-      <div className="sticky top-0 bg-blue-900 z-10 flex items-center justify-between p-4 border-b border-blue-700">
-        <h2 className="text-xl font-bold">Admin Panel</h2>
+      <div className="flex justify-between items-center px-4 py-3 border-b">
+        <h2 className="text-lg font-bold text-blue-800">Admin Panel</h2>
         <button
-          onClick={toggleSidebar}
-          className="text-white hover:text-red-300"
+          onClick={onClose}
+          className="text-xl text-gray-700"
         >
           <FaTimes />
         </button>
       </div>
       <nav className="p-4 flex flex-col space-y-4">
-        <Link to="/userprofile" className="hover:text-blue-300">Account</Link>
+        <Link to="/adminDashboard" className="hover:text-blue-300">Account</Link>
         <Link to="/admin/users" className="hover:text-blue-300">Users</Link>
-        <Link to="/admin/claims" className="hover:text-blue-300">Claims</Link>
-        <Link to="/admin/fact-checkers" className="hover:text-blue-300">Fact Checkers</Link>
-        <Link to="/admin/reporters" className="hover:text-blue-300">Reporters</Link>
+        <Link to="/admin/articles" className="hover:text-blue-300">Articles</Link>
+         <Link to="/admin/reporters" className="hover:text-blue-300">Claims</Link>
+          <Link to="/admin/reporters" className="hover:text-blue-300">Flagged articles</Link>
+        <Link to="/admin/fact-checkers" className="hover:text-blue-300">Reporter applications</Link>
+        <Link to="logout" onClick={handleLogout} className="hover:text-blue-300">Logout</Link>
       </nav>
     </div>
   );

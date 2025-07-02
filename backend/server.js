@@ -7,7 +7,6 @@ import Drafts from "./models/Drafts.js";
 import Article from "./models/Article.js";
 import adminRoutes from './routes/adminRoutes.js';
 import userRoutes from "./routes/userRoutes.js";
-import userRoutes from "./routes/userRoutes.js";
 import path from "path";
 import { fileURLToPath } from 'url';
 import { dirname } from 'path';

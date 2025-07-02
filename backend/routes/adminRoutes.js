@@ -1,5 +1,6 @@
 import express from 'express';
 import User from '../models/User.js';
+import Article from '../models/Article.js';
 
 
 const router = express.Router()
@@ -35,6 +36,17 @@ router.patch("/users/:id/role", async (req, res) => {
     res.status(500).json({ error: "Server error" });
   }
 });
+
+
+router.get('/articles', async (req, res) => {
+  try {
+    const articles = await Article.find().sort({ createdAt: -1 });
+    res.status(200).json(articles);
+  } catch (err) {
+    res.status(500).json({ message: 'Failed to fetch articles', error: err.message });
+  }
+});
+
 
 
 export default router;

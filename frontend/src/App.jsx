@@ -15,6 +15,7 @@ import AdminDashboard from './pages/AdminDashboard'
 import UserProfile from './components/UserProfile'
 import EditorDashboard from './pages/EditorDashboard'
 import UsersTable from './components/UsersTable'
+import ArticleList from './components/Articlelist'
 import ClaimDetails from './pages/ClaimDetails'
 
 const Home = () => (
@@ -47,6 +48,7 @@ const App = () => {
         <Route path="/userprofile" element={<UserProfile />} />
         <Route path="/admin/users" element={<UsersTable />} />
         <Route path="/claimdetails" element={<ClaimDetails />} />
+        <Route path="/admin/articles" element={<ArticleList />} />
 
 
 

@@ -6,17 +6,20 @@ import { FaBars } from 'react-icons/fa'
 
 const UsersTable = () => {
   const [users, setUsers] = useState([])
-  const [sidebarOpen, setSidebarOpen] = useState(false)
-
-const toggleSidebar = () => {
-  setSidebarOpen(!sidebarOpen)
-}
+  const [isAdminSidebarOpen, setAdminSidebarOpen] = useState(false);
+  
+    const toggleSidebar = () => setAdminSidebarOpen((prev) => !prev);
 
 
 useEffect(() => {
   const fetchUsers = async () => {
     try {
-      const res = await axios.get('http://localhost:5000/api/users') // ← use full URL or proxy
+      const token = localStorage.getItem("token"); 
+      const res = await axios.get('http://localhost:5000/api/users', {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
       console.log("✅ Real data:", res.data)
       setUsers(res.data)
     } catch (err) {
@@ -30,15 +33,17 @@ useEffect(() => {
 
 const handleRoleChange = async (userId, newRole) => {
   try {
-    await axios.put(`http://localhost:5000/api/users/${userId}/role`, {
-      role: newRole,
-    })
-    // optional: update local state immediately
-    setUsers((prevUsers) =>
-      prevUsers.map((user) =>
-        user._id === userId ? { ...user, role: newRole } : user
-      )
-    )
+    const token = localStorage.getItem("token");
+
+await axios.put(
+  `http://localhost:5000/api/users/${userId}/role`,
+  { role: newRole },
+  {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  }
+);
     console.log('✅ Role updated successfully')
   } catch (err) {
     console.error('❌ Failed to update role:', err)
@@ -51,7 +56,13 @@ const handleDeleteUser = async (userId) => {
   if (!confirmDelete) return
 
   try {
-    await axios.delete(`http://localhost:5000/api/users/${userId}`)
+    const token = localStorage.getItem("token");
+
+await axios.delete(`http://localhost:5000/api/users/${userId}`, {
+  headers: {
+    Authorization: `Bearer ${token}`,
+  },
+});
     setUsers(prevUsers => prevUsers.filter(user => user._id !== userId))
     console.log('🗑️ User deleted successfully')
   } catch (err) {
@@ -62,22 +73,24 @@ const handleDeleteUser = async (userId) => {
 
 
   return (
-    <div className="flex flex-1">
-      <AdminSidebar isOpen={sidebarOpen} toggleSidebar={toggleSidebar} />
+    <div className="relative min-h-screen bg-gray-100 font-sans flex flex-col">
+      {/* Sidebar */}
+      <AdminSidebar isOpen={isAdminSidebarOpen} onClose={() => setAdminSidebarOpen(false)} />
 
-      
-      <div
-        className={`flex-1 min-h-screen bg-gray-100 transition-all duration-300 ${
-          sidebarOpen ? "ml-64" : "ml-0"
-        }`}
+      {/* Toggle Button */}
+      <button
+        onClick={toggleSidebar}
+        className="text-blue-800 text-2xl m-4 focus:outline-none"
       >
+        <FaBars />
+      </button>
+     <main
+  className={`transition-all duration-300 ${
+    isAdminSidebarOpen ? "ml-64" : "ml-0"
+  } p-6 bg-blue-50 min-h-screen`}
+>
+  <div className="flex flex-col lg:flex-row gap-6">
 
-      <div className="flex-1 p-4">
-        {/* 👇 Hamburger icon */}
-        <FaBars
-          className="text-2xl mb-4 cursor-pointer text-gray-800"
-          onClick={toggleSidebar}
-        />
     <div className="flex-1 p-4">
       <h2 className="text-2xl font-bold mb-4">Users</h2>
       <div className="overflow-x-auto shadow rounded-lg">
@@ -145,8 +158,8 @@ const handleDeleteUser = async (userId) => {
       </div>
     </div>
     </div>
-   </div>
-    </div>
+    </main>
+  </div>
   )
 }
 

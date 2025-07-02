@@ -1,14 +1,15 @@
 import React, { useState, useEffect } from "react";
 import AdminSidebar from "../components/AdminSidebar";
-import UsersTable from "../components/UsersTable";
 import { FaBars } from "react-icons/fa";
 import UserProfileCard from "../components/UserProfile";
 
-const AdminDashboard = () => {
-  const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [users, setUsers] = useState([]);
 
-  const toggleSidebar = () => setSidebarOpen(!sidebarOpen);
+
+const AdminDashboard = () => { 
+  const [users, setUsers] = useState([]);
+ const [isAdminSidebarOpen, setAdminSidebarOpen] = useState(false);
+
+  const toggleSidebar = () => setAdminSidebarOpen((prev) => !prev);
 
 useEffect(() => {
   const fetchData = async () => {
@@ -67,27 +68,36 @@ useEffect(() => {
 
 
   return (
-    <div className="flex flex-1">
+    <div className="relative min-h-screen bg-gray-100 font-sans flex flex-col">
       {/* Sidebar */}
-      <AdminSidebar isOpen={sidebarOpen} toggleSidebar={toggleSidebar} />
+      <AdminSidebar isOpen={isAdminSidebarOpen} onClose={() => setAdminSidebarOpen(false)} />
+
+      {/* Toggle Button */}
+      <button
+        onClick={toggleSidebar}
+        className="text-blue-800 text-2xl m-4 focus:outline-none"
+      >
+        <FaBars />
+      </button>
 
       {/* Main Content */}
-      <div
-        className={`flex-1 min-h-screen bg-gray-100 transition-all duration-300 ${
-          sidebarOpen ? "ml-64" : "ml-0"
-        }`}
-      > 
-        
-        {/* Dashboard Content */}
-        <div className="p-6">
-        {user && (
-          <div className="mb-6">
-             <UserProfileCard user={user} />
-                 </div>
-        )}
-
-        </div>
-      </div>
+      <main
+  className={`transition-all duration-300 ${
+    isAdminSidebarOpen ? "ml-64" : "ml-0"
+  } p-6 bg-blue-50 min-h-screen`}
+>
+  <div className="flex flex-col lg:flex-row gap-6">
+    {/* Left Section */}
+    <div className="flex-1 space-y-6">
+      
+      {user && (
+  <div className="mb-6">
+    <UserProfileCard user={user} />
+  </div>
+)}
+    </div>
+  </div>
+</main>
     </div>
   );
 };

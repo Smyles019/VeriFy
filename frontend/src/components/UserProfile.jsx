@@ -38,6 +38,7 @@ const UserProfile = () => {
           email: data.email || '',
           phone: data.phone || '',
           profilePicUrl: data.profilePicUrl || '',
+          role: data.role || '',
         });
 
         if (data.profilePicUrl) {
@@ -130,6 +131,22 @@ const UserProfile = () => {
 
   console.log("PROFILE PIC VALUE:", profilePic);
 
+  const getRoleTagColor = (role) => {
+  switch (role) {
+    case 'admin':
+      return 'bg-red-100 text-red-700';
+    case 'editor':
+      return 'bg-purple-100 text-purple-700';
+    case 'fact-checker':
+      return 'bg-blue-100 text-blue-700';
+    case 'reporter':
+      return 'bg-green-100 text-green-700';
+    default:
+      return 'bg-gray-100 text-gray-700';
+  }
+};
+
+
 
   return (
     <div className="max-w-3xl mx-auto p-6 bg-white rounded-2xl shadow-md mt-10">
@@ -166,6 +183,16 @@ const UserProfile = () => {
 </button>
 
         </div>
+           {formData.role && (
+  <span
+    className={`mt-2 px-3 py-1 text-sm font-medium rounded-full ${getRoleTagColor(
+      formData.role
+    )}`}
+  >
+    {formData.role.charAt(0).toUpperCase() + formData.role.slice(1)}
+  </span>
+)}
+
         {profilePic && (
           <button onClick={removeImage} className="mt-2 text-sm text-red-500 hover:underline">
             Remove Photo

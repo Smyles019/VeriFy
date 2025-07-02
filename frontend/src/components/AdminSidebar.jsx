@@ -15,7 +15,7 @@ const AdminSidebar = ({ isOpen, onClose }) => {
   };
   return (
      <div
-  className={`absolute left-0 top-0 w-64 bg-white z-40 transform transition-transform duration-300 ease-in-out h-[calc(100vh-70px)] overflow-y-auto shadow-lg ${
+  className={`absolute left-0 top-0 h-full w-64 bg-white z-40 transform transition-transform duration-300 ease-in-out h-[calc(100vh-70px)] overflow-y-auto shadow-lg ${
     isOpen ? 'translate-x-0' : '-translate-x-full'
   }`}
 >

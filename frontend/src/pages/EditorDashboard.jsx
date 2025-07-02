@@ -4,9 +4,11 @@ import ReactQuill from "react-quill"
 import 'react-quill/dist/quill.snow.css'
 import axios from 'axios'
 import Modal from '../components/Modal'
+import EditorSidebar from "../components/editorSidebar"
 
 const EditorDashboard = () => {
-    const [sidebarOpen, setSidebarOpen] = useState(false);
+    const [isEditorSidebarOpen, setEditorSidebarOpen] = useState(false);
+  const toggleSidebar = () => setEditorSidebarOpen((prev) => !prev);
     const [articles, setArticles] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
@@ -130,32 +132,22 @@ const EditorDashboard = () => {
   };
 
   return (
-    <div className="min-h screen bg-gray-50">
-        {/*Button*/}
-            <button
-             onClick={() => setSidebarOpen(!sidebarOpen)}
-             className="fixed top-4 left-4 z-40 text-blue-100 text-2xl"
-            >
-               <FaBars size={24} />                  
-            </button>
-            
-        <div className="flex">
-          {/*Sidebar*/}
-          <aside  className={`fixed top-0 left-0 h-full w-64 bg-blue-600 text-white flex flex-col z-30 transform transition-transform duration-300 ease-in-out ${
-          sidebarOpen ? 'translate-x-0' : '-translate-x-full'
-        }`}>
-            <nav className="p-4 space-y-2">
-              <a href="#" className="block py-3 px-4 rounded hover:bg-blue-700 transition-colors">Home</a>
-              <a href="#" className="block py-3 px-4 rounded hover:bg-blue-700 transition-colors">All Articles</a>
-              <a href="#" className="block py-3 px-4 rounded hover:bg-blue-700 transition-colors">Approved</a>
-              <a href="#" className="block py-3 px-4 rounded hover:bg-blue-700 transition-colors">Pending</a>
-              <a href="#" className="block py-3 px-4 rounded hover:bg-blue-700 transition-colors">Profile</a>
-              <a href="#" className="block py-3 px-4 rounded hover:bg-blue-700 transition-colors">Log Out</a>
-            </nav>
-          </aside>
+      <div className="relative min-h-screen bg-gray-100 font-sans">
+      {/* Sidebar */}
+      <EditorSidebar isOpen={isEditorSidebarOpen} onClose={() => setEditorSidebarOpen(false)} />
+
+      {/* Toggle Button */}
+      <button
+        onClick={toggleSidebar}
+        className="text-blue-800 text-2xl m-4 focus:outline-none"
+      >
+        <FaBars />
+      </button>
 
         {/*Main Content*/}
-        <main className="w-full min-h-screen bg-gray-100 p-8">
+         <main className={`transition-all duration-300 ${isEditorSidebarOpen ? "ml-64" : "ml-0"} p-6 bg-blue-50 min-h-screen`}>
+        <div className="flex flex-col lg:flex-row gap-6">
+        <div className="flex-1 space-y-6">
             <div className="w-full max-w-none">
                 <div className="flex justify-between items-center mb-6">
               <h2 className="text-2xl font-bold text-gray-800">Articles from Reporters</h2>
@@ -270,8 +262,9 @@ const EditorDashboard = () => {
               </div>
             )}
           </div>
+        </div>
+        </div>
         </main>
-      </div>
 
       {/*View Modal*/}
 

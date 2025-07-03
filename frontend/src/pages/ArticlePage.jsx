@@ -28,6 +28,14 @@ const ArticlePage = () => {
     return (
        <div className='max-w-3xl mx-auto p-6'>
         <h1 className='text-2xl font-bold mb-4'>{article.title}</h1>
+        {article.image && (
+           <img
+             src={`http://localhost:5000/uploads/${article.image}`}
+             alt={article.title}
+             className='w-full h-auto mb-4 rounded'
+           />  
+        )}
+        
         <p className='text-gray-700 mb-2'>{article.description}</p>
 
         <div className='text-sm text-gray-500 flex justify-between items-center mb-4'>

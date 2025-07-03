@@ -4,7 +4,7 @@ const draftSchema = new mongoose.Schema({
     title: { type: String, required: true},
     content: { type: String},
     tags: [String],
-    image: { type: String},
+    image: { type: String, default: ''},
     createdAt: { type: Date, default: Date.now},
 });
 

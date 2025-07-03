@@ -8,7 +8,7 @@ import EditorSidebar from "../components/editorSidebar"
 
 const EditorDashboard = () => {
     const [isEditorSidebarOpen, setEditorSidebarOpen] = useState(false);
-  const toggleSidebar = () => setEditorSidebarOpen((prev) => !prev);
+    const toggleSidebar = () => setEditorSidebarOpen((prev) => !prev);
     const [articles, setArticles] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
@@ -183,6 +183,13 @@ const EditorDashboard = () => {
                     <div key={article._id || article.id} className="bg-white rounded-lg p-6 shadow-sm border hover:shadow-md transition-shadow">                    
                       <div className="flex justify-between items-start">
                         <div className="flex-1">
+                          {article.image && (
+                            <img 
+                               src={`http://localhost:5000/uploads/${article.image}`}
+                               alt="Article"
+                               className="w-full h-40 object-cover rounded mb-3"
+                            />
+                          )}
                           <div className="flex items-center gap-3 mb-2">
                             <h3 className="font-semibold text-gray-800 text-lg">{article.title}</h3>
                             <span className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(article.status)}`}>
@@ -284,6 +291,14 @@ const EditorDashboard = () => {
                   </span> 
                 ))}
                </div>
+            )}
+
+            {currentArticle.image && (
+              <img 
+                 src={`http://localhost:5000/uploads/${currentArticle.image}`}
+                 alt="Article Preview"
+                 className="w-full h-48 object-cover rounded mb-4"
+              />
             )}
 
             <div

@@ -17,7 +17,8 @@ const ReporterDashboard = () => {
   const [content, setContent] = useState("");
   const [tags, setTags] = useState([]);
   const [newTag, setNewTag] = useState("");
-  const [image, setImage] = useState(null);
+  const [imageFile, setImageFile] = useState(null);
+  const [imagePreview, setImagePreview] = useState(null);
   const [reporterName, setReporterName] = useState("");
 
   //State for editing drafts
@@ -48,7 +49,7 @@ const ReporterDashboard = () => {
     setTitle(draft.title);
     setContent(draft.content || "");
     setTags(draft.tags || []);
-    setImage(draft.image || null);
+    setImagePreview(draft.image ? `http://localhost:5000/uploads/${draft.image}` : null);
     setModalOpen(true);
   };
   
@@ -58,33 +59,36 @@ const ReporterDashboard = () => {
     setContent("");
     setTags([]);
     setNewTag("");
-    setImage(null);
+    setImageFile(null);
+    setImagePreview(null);
   };
 
   const handleSaveDraft = async () => {
     if(!title.trim()) return;
 
     try{
+      const formData = new FormData();
+      formData.append('title', title);
+      formData.append('content', content);
+      formData.append('tags', tags[0] || '');
+      if (imageFile) formData.append('image', imageFile);
+
       if(isEditing && editingDraft){
       
         //Update exisiting draft
-      const res =  await axios.put(`http://localhost:5000/api/drafts/${editingDraft._id}`, {
-        title,
-        content, 
-        tags,
-        image   
-      });
+      const res =  await axios.put(`http://localhost:5000/api/drafts/${editingDraft._id}`,
+        formData,
+         { headers: { 'Content-Type' : 'multipart/form-data' } }           
+      );
 
       //Update the drafts array with the updated draft      
       setDrafts(drafts.map(d => d._id === editingDraft._id ? res.data : d));
     } else{
       //Create new draft
-      const res = await axios.post('http://localhost:5000/api/drafts', {
-        title,
-        content,
-        tags,
-        image
-      });
+      const res = await axios.post('http://localhost:5000/api/drafts',
+        formData, 
+        { headers: { 'Content-Type' : 'multipart/form-data' } }       
+    );
       setDrafts([...drafts, res.data]);
      }   
     } catch (error) {
@@ -102,19 +106,20 @@ const ReporterDashboard = () => {
     if(!title.trim()) return;
 
       try{
-
-       const articleData = {
-        title,
-        content,
-        tags,
-        image,
-        submittedBy: reporterName,
-        submittedAt: new Date().toISOString(),
-        status: 'pending_review' 
-     };
+        const formData = new FormData();
+        const dateOptions = { day: '2-digit', month: '2-digit', year: 'numeric' };
+        formData.append('title', title);
+        formData.append('content', content);
+        formData.append('tags',  tags[0] || '');
+        if (imageFile) formData.append('image', imageFile);
+        formData.append('submittedBy', reporterName);  
+        formData.append('submittedAt', new Date().toLocaleDateString());
+        formData.append('status', 'pending_review');
 
      //Send draft to editor as article
-     const response = await axios.post('http://localhost:5000/api/articles', articleData);
+     const response = await axios.post('http://localhost:5000/api/articles', 
+      formData, { headers: { 'Content-Type' : 'multipart/form-data' } }
+     );
 
      if(response.status === 200 || response.status === 201){
         //Show success message
@@ -229,10 +234,13 @@ const ReporterDashboard = () => {
             type='file'
             accept='image/*'
             className='mt-2'
-            onChange={(e) => setImage(URL.createObjectURL(e.target.files[0]))}         
+            onChange={(e) => {
+                setImageFile(e.target.files[0]);
+                setImagePreview(URL.createObjectURL(e.target.files[0]));
+             }}
           />
 
-          {image && <img src={image} alt='Preview' className='h-32 mt-2 object-cover rounded'/>}
+          {imagePreview && <img src={imagePreview} alt='Preview' className='h-32 mt-2 object-cover rounded'/>}
 
           <div className='space-y-2'>
             <label className='block text-sm font-medium text-gray-700'>Category</label>

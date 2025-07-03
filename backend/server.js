@@ -10,9 +10,8 @@ import userRoutes from "./routes/userRoutes.js";
 import path from "path";
 import { fileURLToPath } from 'url';
 import { dirname } from 'path';
-
-
-
+import multer from 'multer';
+import fs from 'fs';
 
 dotenv.config();
 const app = express();
@@ -20,16 +19,21 @@ const PORT = process.env.PORT || 5000;
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => cb(null, 'uploads/'),
+  filename: (req, file, cb) => cb(null, Date.now() + '-' + file.originalname),
+});
+
+const upload = multer({ storage });
+
 app.use(cors());
 app.use(express.json());
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 
-
 app.use("/api/auth", authRoutes);
 app.use("/api/admin", adminRoutes); 
 app.use("/api/users", userRoutes);
-
 
 app.get('/api/user/:id', async (req, res) => {
   const user = await User.findById(req.params.id);
@@ -42,6 +46,7 @@ app.put('/api/user/:id', async (req, res) => {
   res.json(user);
 });
 
+//Fetching drafts from reporter dashboard
 app.get('/api/drafts', async (req, res) => {
   try{
   const drafts = await Drafts.find().sort({ createdAt: -1 });
@@ -52,10 +57,17 @@ app.get('/api/drafts', async (req, res) => {
  }
 });
 
-app.post('/api/drafts', async (req, res) => {
+app.post('/api/drafts', upload.single('image'), async (req, res) => {
   console.log('Received draft:', req.body);
   try {
-    const newDraft = new Drafts(req.body);
+    const { title, content, tags } = req.body;
+    const image = req.file ? req.file.filename : null;
+    const newDraft = new Drafts({
+      title,
+      content,
+      tags: tags ? [tags] : [],  
+      image
+  });
     await newDraft.save();
     res.status(201).json(newDraft);
   } catch (error) {
@@ -64,9 +76,13 @@ app.post('/api/drafts', async (req, res) => {
   }
 });
 
-app.put('/api/drafts/:id', async (req, res) => {
+app.put('/api/drafts/:id', upload.single('image'), async (req, res) => {
   try{
-  const updated = await Drafts.findByIdAndUpdate(req.params.id, req.body, { new: true });
+  const { title, content, tags } = req.body; 
+  const updatedData = { title, content, tags: tags ? [tags] : [] };
+  if (req.file) updatedData.image = req.file.filename;
+
+  const updated = await Drafts.findByIdAndUpdate(req.params.id, { new: true });
   if (!updated){
     return res.status(404).json({ error: 'Draft not found' });
   }
@@ -90,7 +106,7 @@ app.delete('/api/drafts/:id', async (req, res) => {
  } 
 });
 
-//Article routes for submitted drafts
+//Article routes for submitted drafts 
 app.get('/api/articles', async (req, res) => {
    try{
     const articles = await Article.find().sort({ submittedAt: -1 });
@@ -101,18 +117,21 @@ app.get('/api/articles', async (req, res) => {
    }
 });
 
-app.post('/api/articles', async (req, res) => {
+//Routes for posting articles 
+app.post('/api/articles', upload.single('image'), async (req, res) => {
   console.log('Received article submission:', req.body);
   try{
     //creating new article from submitted draft
+    const { title, content, tags, submittedBy, submittedAt, status } = req.body;
+    const image = req.file ? req.file.filename : null;
     const articleData = {
-      title: req.body.title,
-      content: req.body.content,
-      tags: req.body.tags || [],
-      image: req.body.image,
-      submittedBy: req.body.submittedBy,
-      submittedAt: req.body.submittedAt || new Date(),
-      status: req.body.status || 'pending_review'
+      title,
+      content,
+      tags,
+      image,
+      submittedBy,
+      submittedAt: submittedAt || new Date(),
+      status: status || 'pending_review'
     };
 
     const newArticle = new Article(articleData);

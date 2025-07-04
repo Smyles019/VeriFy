@@ -49,6 +49,7 @@ const ReporterDashboard = () => {
     setTitle(draft.title);
     setContent(draft.content || "");
     setTags(draft.tags || []);
+    setImageFile(null);
     setImagePreview(draft.image ? `http://localhost:5000/uploads/${draft.image}` : null);
     setModalOpen(true);
   };
@@ -71,7 +72,12 @@ const ReporterDashboard = () => {
       formData.append('title', title);
       formData.append('content', content);
       formData.append('tags', tags[0] || '');
-      if (imageFile) formData.append('image', imageFile);
+      if (imageFile){
+        formData.append('image', imageFile);
+      } else if (isEditing && editingDraft?.image) {
+        //Preserve existing image file name
+        formData.append('existingImage', editingDraft.image);
+      }
 
       if(isEditing && editingDraft){
       
@@ -83,7 +89,7 @@ const ReporterDashboard = () => {
 
       //Update the drafts array with the updated draft      
       setDrafts(drafts.map(d => d._id === editingDraft._id ? res.data : d));
-    } else{
+    } else {
       //Create new draft
       const res = await axios.post('http://localhost:5000/api/drafts',
         formData, 
@@ -107,13 +113,16 @@ const ReporterDashboard = () => {
 
       try{
         const formData = new FormData();
-        const dateOptions = { day: '2-digit', month: '2-digit', year: 'numeric' };
         formData.append('title', title);
         formData.append('content', content);
         formData.append('tags',  tags[0] || '');
-        if (imageFile) formData.append('image', imageFile);
+        if (imageFile){
+         formData.append('image', imageFile);
+        } else if (isEditing && editingDraft?.image) {
+          formData.append('existingImage', editingDraft.image); 
+        } 
         formData.append('submittedBy', reporterName);  
-        formData.append('submittedAt', new Date().toLocaleDateString());
+        formData.append('submittedAt', new Date().toLocaleString());
         formData.append('status', 'pending_review');
 
      //Send draft to editor as article

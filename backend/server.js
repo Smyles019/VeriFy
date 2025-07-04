@@ -78,11 +78,17 @@ app.post('/api/drafts', upload.single('image'), async (req, res) => {
 
 app.put('/api/drafts/:id', upload.single('image'), async (req, res) => {
   try{
-  const { title, content, tags } = req.body; 
-  const updatedData = { title, content, tags: tags ? [tags] : [] };
+  const { title, content, tags, existingImage } = req.body; 
+  const updatedData = { 
+    title,
+    content, 
+    tags: tags ? [tags] : [], 
+    image: req.file ? req.file.filename : existingImage || undefined
+   };
+
   if (req.file) updatedData.image = req.file.filename;
 
-  const updated = await Drafts.findByIdAndUpdate(req.params.id, { new: true });
+  const updated = await Drafts.findByIdAndUpdate(req.params.id, updatedData, { new: true });
   if (!updated){
     return res.status(404).json({ error: 'Draft not found' });
   }
@@ -123,7 +129,7 @@ app.post('/api/articles', upload.single('image'), async (req, res) => {
   try{
     //creating new article from submitted draft
     const { title, content, tags, submittedBy, submittedAt, status } = req.body;
-    const image = req.file ? req.file.filename : null;
+    const image = req.file ? req.file.filename : req.body.existingImage || null;
     const articleData = {
       title,
       content,

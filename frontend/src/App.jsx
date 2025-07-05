@@ -1,4 +1,5 @@
-import React from 'react'
+import { useEffect, useState} from 'react'
+import axios from 'axios'
 import { BrowserRouter as Router, Routes, Route} from 'react-router-dom'
 import Navbar from './components/Navbar'
 import NewsSection from './components/NewsSection'
@@ -17,6 +18,7 @@ import EditorDashboard from './pages/EditorDashboard'
 import UsersTable from './components/UsersTable'
 import ArticleList from './components/Articlelist'
 import ClaimDetails from './pages/ClaimDetails'
+import ArticlePage from './pages/ArticlePage'
 import SubmitClaim from './components/Submitclaim'
 
 const Home = () => (
@@ -28,8 +30,8 @@ const Home = () => (
 )
 const NotFound = () => <h2>404 Not Found</h2>
 
-
 const App = () => {
+    
     return( 
     <Router>
      <Navbar />  
@@ -50,14 +52,16 @@ const App = () => {
         <Route path="/admin/users" element={<UsersTable />} />
         <Route path="/claimdetails" element={<ClaimDetails />} />
         <Route path="/admin/articles" element={<ArticleList />} />
-        <Route path="/submitclaim" element={<SubmitClaim />} />
-
+         <Route path="/submitclaim" element={<SubmitClaim />} />
+         <Route path="/article/:id" element={<ArticlePage />} />
 
 
   
         
       </Routes>
+    
     </div>
+
     <Footer />
     </Router>
   ) 

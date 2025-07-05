@@ -4,7 +4,7 @@ const articleSchema = new mongoose.Schema({
    title: { type: String, required: true, trim: true},
    content: { type: String, required: true},
    tags: [{ type: String, trim: true}],
-   image: { type: String},
+   image: { type: String, default: ''},
    submittedBy: { type: String, required: true},
    submittedAt: { type: Date, default: Date.now},
    status: { type: String, enum: ['pending_review', 'approved', 'rejected', 'published'], default: 'pending_review'},

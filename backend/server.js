@@ -12,6 +12,7 @@ import { fileURLToPath } from 'url';
 import { dirname } from 'path';
 import multer from 'multer';
 import fs from 'fs';
+import claimRoutes from './routes/claimRoutes.js';
 
 dotenv.config();
 const app = express();
@@ -34,6 +35,7 @@ app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 app.use("/api/auth", authRoutes);
 app.use("/api/admin", adminRoutes); 
 app.use("/api/users", userRoutes);
+app.use("/api/claims", claimRoutes);
 
 app.get('/api/user/:id', async (req, res) => {
   const user = await User.findById(req.params.id);
@@ -78,12 +80,17 @@ app.post('/api/drafts', upload.single('image'), async (req, res) => {
 
 app.put('/api/drafts/:id', upload.single('image'), async (req, res) => {
   try{
-  const { title, content, tags } = req.body; 
-  const updatedData = { title, content, tags: tags ? [tags] : [], image: req.file ? req.file.filename : existingimage || undefined
+  const { title, content, tags, existingImage } = req.body; 
+  const updatedData = { 
+    title,
+    content, 
+    tags: tags ? [tags] : [], 
+    image: req.file ? req.file.filename : existingImage || undefined
    };
+
   if (req.file) updatedData.image = req.file.filename;
 
-  const updated = await Drafts.findByIdAndUpdate(req.params.id, { new: true });
+  const updated = await Drafts.findByIdAndUpdate(req.params.id, updatedData, { new: true });
   if (!updated){
     return res.status(404).json({ error: 'Draft not found' });
   }
@@ -212,6 +219,7 @@ app.delete('/api/articles/:id', async (req, res) => {
     res.status(500).json({ error: 'Failed to delete article' });
   }
 });
+
 
 mongoose.connect(process.env.MONGO_URI, { useNewUrlParser: true, useUnifiedTopology: true })
   .then(() => {

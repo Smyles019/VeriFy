@@ -3,6 +3,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import { FaBars } from "react-icons/fa";
 import Sidebar from "../components/Sidebar";
 import Navbar from "../components/Navbar";
+import axios from "axios";
 
 const verdictColors = {
   True: "bg-green-100 text-green-800",
@@ -15,7 +16,7 @@ const verdictColors = {
 const statusColors = {
   Pending: "bg-yellow-100 text-yellow-800",
   Reviewed: "bg-green-100 text-green-800",
-  Dismissed: "bg-gray-200 text-gray-800",
+  Reviewing: "bg-gray-200 text-gray-800",
 };
 
 const ClaimReview = () => {
@@ -33,14 +34,23 @@ const ClaimReview = () => {
   const [notes, setNotes] = useState("");
   const [evidence, setEvidence] = useState(null);
 
-  useEffect(() => {
-    setClaim({
-      id,
-      text: "COVID-19 vaccines contain microchips.",
-      submittedBy: "user@example.com",
-      date: "2025-06-27",
-    });
-  }, [id]);
+ useEffect(() => {
+  const fetchClaim = async () => {
+    try {
+      const res = await axios.get(`http://localhost:5000/api/claims/${id}`, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('token')}`,
+        },
+      });
+      setClaim(res.data);
+    } catch (err) {
+      console.error("Failed to fetch claim:", err);
+    }
+  };
+
+  fetchClaim();
+}, [id]);
+
 
   const handleAddSource = () => {
     setSources([...sources, ""]);
@@ -52,21 +62,42 @@ const ClaimReview = () => {
     setSources(updated);
   };
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
+  const handleSubmit = async (e) => {
+  e.preventDefault();
 
-    const formData = {
-      verdict,
-      status,
-      notes,
-      sources: sources.filter((s) => s.trim() !== ""),
-      evidence,
-    };
+  const formData = new FormData();
+  formData.append("verdict", verdict);
+  formData.append("status", status);
+  formData.append("notes", notes);
+  sources.forEach((source) => {
+    formData.append("sources", source); // handles multiple sources
+  });
+  if (evidence) {
+    formData.append("evidence", evidence);
+  }
 
-    console.log("Review Submitted:", formData);
-    alert("Review submitted (mock)");
-    navigate("/factchecker");
-  };
+  try {
+    const response = await axios.post(
+      `http://localhost:5000/api/claims/${id}/review`,
+      formData,
+      {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+          "Content-Type": "multipart/form-data",
+        },
+      }
+    );
+    alert("Review submitted successfully!");
+    navigate("/claimdetails"); 
+    console.error("Failed to submit review:", err);
+    alert("Error submitting review");
+  }
+  catch (err) {
+    console.error("Failed to submit review:", err);
+    alert("Error submitting review");
+  }
+};
+
 
   if (!claim) return <p className="text-center p-10">Loading claim...</p>;
 
@@ -89,16 +120,32 @@ const ClaimReview = () => {
       <h1 className="text-2xl font-bold text-blue-800 mb-4">Review Claim</h1>
 
       <div className="bg-white shadow rounded p-4 mb-6">
-        <p className="text-lg font-medium text-gray-800">{claim.text}</p>
-        <p className="text-sm text-gray-500 mt-2">
-          Submitted by: {claim.submittedBy} on {claim.date}
-        </p>
-        <span
-          className={`inline-block mt-3 px-3 py-1 rounded-full text-sm font-medium ${statusColors[status]}`}
-        >
-          Status: {status}
-        </span>
-      </div>
+  <h2 className="text-xl font-bold text-gray-800 mb-2">{claim.title}</h2>
+  <p className="text-sm text-gray-600 italic mb-2">Category: {claim.category}</p>
+  <p className="text-base text-gray-700 mb-4">{claim.content}</p>
+
+  <p className="text-sm text-gray-500">
+    Submitted by: {claim.user?.email || "Unknown"} on{" "}
+    {new Date(claim.createdAt).toLocaleDateString()}
+  </p>
+
+  {claim.image && (
+    <div className="mt-4">
+      <img
+        src={`http://localhost:5000/${claim.image}`}
+        alt="Uploaded claim"
+        className="max-h-60 rounded border"
+      />
+    </div>
+  )}
+
+  <span
+    className={`inline-block mt-4 px-3 py-1 rounded-full text-sm font-medium ${statusColors[status]}`}
+  >
+    Status: {status}
+  </span>
+</div>
+
 
       <form
         onSubmit={handleSubmit}
@@ -143,8 +190,8 @@ const ClaimReview = () => {
             required
           >
             <option value="Pending">Pending</option>
+            <option value="Reviewing">Reviewing</option>
             <option value="Reviewed">Reviewed</option>
-            <option value="Dismissed">Dismissed</option>
           </select>
         </div>
 

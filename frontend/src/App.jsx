@@ -20,7 +20,8 @@ import ArticleList from './components/Articlelist'
 import ClaimDetails from './pages/ClaimDetails'
 import ArticlePage from './pages/ArticlePage'
 import SubmitClaim from './components/Submitclaim'
-import { use } from 'react'
+import MyClaims from './pages/MyClaims'
+import ClaimReview from './pages/ReviewClaim'
 
 const Home = () => {
   const [approvedArticles, setApprovedArticles] = useState([]);
@@ -83,6 +84,8 @@ const App = () => {
         <Route path="/admin/articles" element={<ArticleList />} />
         <Route path="/submitclaim" element={<SubmitClaim />} />
         <Route path="/article/:id" element={<ArticlePage />} />
+        <Route path="/review/:id" element={<ClaimReview />} />
+        <Route path="/myclaims" element={<MyClaims />} />
 
 
   

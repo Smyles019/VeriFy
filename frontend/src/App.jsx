@@ -20,14 +20,43 @@ import ArticleList from './components/Articlelist'
 import ClaimDetails from './pages/ClaimDetails'
 import ArticlePage from './pages/ArticlePage'
 import SubmitClaim from './components/Submitclaim'
+import { use } from 'react'
 
-const Home = () => (
-  <main className='px-4 md:px-12 lg:px-20'>
-    <NewsSection />
-    <NewsSection />
+const Home = () => {
+  const [approvedArticles, setApprovedArticles] = useState([]);
+
+  useEffect(() => {
+    const fetchApprovedArticles = async () => {
+      try{
+        const response = await axios.get('http://localhost:5000/api/articles');
+        const filtered = response.data.filter(article => article.status === 'approved');
+        setApprovedArticles(filtered);       
+      } catch (error) {
+        console.error('Error fetching approved articles:', error);
+      }
+    };
+    fetchApprovedArticles();
+  }, []);
+
+  //Group articles by their first tag/category
+  const groupedArticles = approvedArticles.reduce((acc, article) => {
+    const category = article.tags?.[0] || 'Uncategorized';
+    if(!acc[category]) acc[category] = [];
+    acc[category].push(article);
+    return acc;
     
-  </main>
-)
+  }, {});
+ 
+  return (
+    <main className="px-4 md:px-12 lg:px-20"> 
+     {Object.entries(groupedArticles).map(([category, articles]) => (
+      <NewsSection  key={category} category={category} articles={articles} />
+    ))}
+    </main>
+  );
+};
+
+
 const NotFound = () => <h2>404 Not Found</h2>
 
 const App = () => {
@@ -52,8 +81,8 @@ const App = () => {
         <Route path="/admin/users" element={<UsersTable />} />
         <Route path="/claimdetails" element={<ClaimDetails />} />
         <Route path="/admin/articles" element={<ArticleList />} />
-         <Route path="/submitclaim" element={<SubmitClaim />} />
-         <Route path="/article/:id" element={<ArticlePage />} />
+        <Route path="/submitclaim" element={<SubmitClaim />} />
+        <Route path="/article/:id" element={<ArticlePage />} />
 
 
   

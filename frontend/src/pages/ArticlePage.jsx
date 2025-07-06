@@ -1,13 +1,14 @@
 import { useParams, useNavigate } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import axios from 'axios';
-import { FaThumbsUp, FaThumbsDown, FaFlag } from 'react-icons/fa';
+import { FaThumbsUp, FaThumbsDown, FaFlag, FaTrash} from 'react-icons/fa';
 import SubmitClaim from '../components/Submitclaim';
 
 const ArticlePage = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const token = localStorage.getItem("token");
+  const [userId, setUserId] = useState(null)
 
   const [article, setArticle] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -15,6 +16,7 @@ const ArticlePage = () => {
 
   const [likes, setLikes] = useState(0);
   const [dislikes, setDislikes] = useState(0);
+  const [flagCount, setFlagCount] = useState(0);
   const [flagged, setFlagged] = useState(false);
   const [comments, setComments] = useState([]);
   const [newComment, setNewComment] = useState("");
@@ -22,6 +24,12 @@ const ArticlePage = () => {
   const [claim, setClaim] = useState(null);
 
   useEffect(() => {
+     const token = localStorage.getItem("token");
+  if (token) {
+    const decoded = JSON.parse(atob(token.split(".")[1]));
+    setUserId(decoded.id);
+  }
+
     const fetchArticle = async () => {
       try {
         const res = await axios.get(`http://localhost:5000/api/articles/${id}`);
@@ -36,8 +44,6 @@ const ArticlePage = () => {
         setLoading(false);
       }
     };
-
-    fetchArticle();
     
       const fetchClaim = async () => {
     try {
@@ -48,17 +54,51 @@ const ArticlePage = () => {
     }
   };
 
+  const fetchComments = async () => {
+    try {
+      const res = await axios.get(`http://localhost:5000/api/articles/${id}/comments`);
+      setComments(res.data);
+    } catch (err) {
+      console.error("Failed to load comments");
+    }
+  };
+
+  fetchArticle();
   fetchClaim();
+  fetchComments();
   
   }, [id]);
 
-  const handleCommentSubmit = (e) => {
-    e.preventDefault();
-    if (newComment.trim()) {
-      setComments([...comments, newComment]);
-      setNewComment("");
-    }
-  };
+  const handleCommentSubmit = async (e) => {
+  e.preventDefault();
+  if (!newComment.trim()) return;
+
+  try {
+    const res = await axios.post(
+      `http://localhost:5000/api/articles/${id}/comments`,
+      { text: newComment },
+      { headers: { Authorization: `Bearer ${token}` } }
+    );
+    setComments([...comments, res.data]);
+    setNewComment("");
+  } catch (err) {
+    console.error("Failed to post comment", err.response?.data || err.message);
+  }
+};
+
+const handleDeleteComment = async (commentId) => {
+  try {
+    await axios.delete(`http://localhost:5000/api/articles/${id}/comments/${commentId}`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+
+    setComments(comments.filter((comment) => comment._id !== commentId));
+  } catch (err) {
+    console.error("Failed to delete comment:", err.response?.data || err.message);
+  }
+};
+
+
 
   const toggleLike = async () => {
     try {
@@ -96,6 +136,7 @@ const ArticlePage = () => {
         { headers: { Authorization: `Bearer ${token}` } }
       );
       setFlagged(res.data.flagged);
+      setFlagCount(res.data.flagCount);
     } catch (err) {
       console.error("Flag failed:", err.response?.data || err.message);
     }
@@ -155,16 +196,20 @@ const ArticlePage = () => {
       {/* === INTERACTIONS BELOW ARTICLE === */}
       <div className="mt-10 border-t pt-6 space-y-6">
 
-        {/* Submit Claim Button */}
         <div>
-          <button
-            onClick={() => setShowModal(true)}
-            className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition"
-          >
-            Submit a Claim
-          </button>
-        </div>
-
+  {claim ? (
+    <p className="text-green-700 font-semibold">
+      ✅ A claim has already been submitted and reviewed for this article.
+    </p>
+  ) : (
+    <button
+      onClick={() => setShowModal(true)}
+      className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition"
+    >
+      Submit a Claim
+    </button>
+  )}
+</div>
         {/* Like / Dislike / Flag */}
         <div className="flex gap-6 items-center">
           <button
@@ -182,13 +227,13 @@ const ArticlePage = () => {
           </button>
 
           <button
-            onClick={toggleFlag}
-            className={`flex items-center gap-1 ${
-              flagged ? 'text-yellow-600' : 'text-gray-600'
-            } hover:text-yellow-600 transition`}
-          >
-            <FaFlag /> {flagged ? "Flagged" : "Flag"}
-          </button>
+  onClick={toggleFlag}
+  className={`flex items-center gap-1 ${
+    flagged ? 'text-yellow-600' : 'text-gray-600'
+  } hover:text-yellow-600 transition`}
+>
+  <FaFlag /> {flagged ? "Flagged" : "Flag"}
+</button>
         </div>
 
         {/* Comments Section */}
@@ -212,12 +257,28 @@ const ArticlePage = () => {
           </form>
 
           <ul className="space-y-2">
-            {comments.map((comment, index) => (
-              <li key={index} className="bg-gray-100 p-3 rounded">
-                {comment}
-              </li>
-            ))}
-          </ul>
+  {comments.map((comment) => (
+    <li key={comment._id} className="bg-gray-100 p-3 rounded relative">
+      <div className="text-sm text-gray-600 mb-1">
+        {comment.user?.firstName || "Anonymous"} •{" "}
+        {new Date(comment.createdAt).toLocaleString()}
+      </div>
+      <div>{comment.text}</div>
+      
+      {comment.user?._id === userId && (
+  <button
+    onClick={() => handleDeleteComment(comment._id)}
+    className="absolute top-2 right-2 text-red-500 hover:text-red-700"
+    title="Delete comment"
+  >
+    <FaTrash />
+  </button>
+)}
+
+    </li>
+  ))}
+</ul>
+
         </div>
       </div>
 {showModal && (

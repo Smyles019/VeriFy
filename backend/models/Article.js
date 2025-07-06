@@ -1,5 +1,15 @@
 import mongoose from "mongoose"
 
+const commentSchema = new mongoose.Schema({
+  user: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "User",
+    required: true,
+  },
+  text: { type: String, required: true },
+  createdAt: { type: Date, default: Date.now },
+});
+
 const articleSchema = new mongoose.Schema({
    title: { type: String, required: true, trim: true},
    content: { type: String, required: true},
@@ -13,15 +23,28 @@ const articleSchema = new mongoose.Schema({
    originalDraftId: {
      type: mongoose.Schema.Types.ObjectId,
      ref: 'Draft'
-   }
-}, {
-   timestamps: true,
-   likes: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
-   dislikes: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
-   flags: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }], 
+   },
+    likes: {
+    type: [mongoose.Schema.Types.ObjectId],
+    ref: 'User',
+    default: [],
+  },
+  dislikes: {
+    type: [mongoose.Schema.Types.ObjectId],
+    ref: 'User',
+    default: [],
+  },
+  flags: {
+    type: [mongoose.Schema.Types.ObjectId],
+    ref: 'User',
+    default: [],
+  }, // Embed comments directly in the article schema
    verdict: { type: String },
    reviewerNotes: { type: String },
    sources: [String],
+   comments: [commentSchema],
+}, {
+   timestamps: true,
 
 });
 
@@ -31,5 +54,7 @@ articleSchema.index({ status: 1 });
 articleSchema.index({ submittedBy: 1});
 
 const Article = mongoose.model('Article', articleSchema);
+const Comment = mongoose.model('Comment', commentSchema);
+
 
 export default Article;

@@ -15,6 +15,7 @@ import fs from 'fs';
 import claimRoutes from './routes/claimRoutes.js';
 import articleActions from  './routes/articleActions.js';
 import applicationRoutes from './routes/applicationRoutes.js';
+import articleRoutes from './routes/articleRoutes.js';
 
 dotenv.config();
 const app = express();
@@ -41,7 +42,7 @@ app.use("/api/articles", articleActions);
 app.use("/api/applications", applicationRoutes);
 app.use("/uploads", express.static("uploads"));
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
-
+app.use('/api/articles', articleRoutes);
 
 app.get('/api/user/:id', async (req, res) => {
   const user = await User.findById(req.params.id);

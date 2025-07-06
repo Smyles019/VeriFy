@@ -105,6 +105,10 @@ const ArticleList = () => {
                     >
                       {article.status}
                     </span>
+                    <br />
+                      {article.flags && (
+                       <span className="text-sm text-gray-500">🚩 Flags: {article.flags.length}</span>
+                        )}
                   </p>
 
                   {article.tags?.length > 0 && (
@@ -119,6 +123,7 @@ const ArticleList = () => {
                       ))}
                     </div>
                   )}
+                  
 
                   <div
                     className="text-gray-800 mt-2"

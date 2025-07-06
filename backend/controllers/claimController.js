@@ -26,7 +26,13 @@ export const getArticleById = async (req, res) => {
 
 export const createClaim = async (req, res) => {
   try {
-    const { title, content, category } = req.body;
+    const { title, content, category, articleId } = req.body;
+
+    const existingClaim = await Claim.findOne({ article: articleId, status: "Reviewed"});
+    if (existingClaim) {
+      return res.status(400).json({ message: "A claim has already been submitted for this article." });
+    }
+
     const imagePath = req.file?.path || null;
 
     const newClaim = new Claim({

@@ -1,7 +1,9 @@
 import express from 'express';
 import multer from 'multer';
-import { createClaim, getMyClaims, getAllClaims, getClaimById, reviewClaim} from '../controllers/claimController.js';
+import mongoose from 'mongoose';
+import { createClaim, getMyClaims, getAllClaims, getClaimById, reviewClaim, updateClaimStatus, getArticleById, getClaimByArticleId} from '../controllers/claimController.js';
 import { protect } from '../middleware/authMiddleware.js';
+import Claim from '../models/Claim.js';
 
 const router = express.Router();
 
@@ -22,22 +24,26 @@ router.get('/my-claims', protect, getMyClaims);
 router.post('/', protect, upload.single('image'), createClaim);
 router.get('/:id', protect, getClaimById);
 router.post('/:id/review', protect, upload.single('evidence'), reviewClaim);
-
-// In claimRoutes.js
-router.put('/claims/:id/status', protect, async (req, res) => {
+router.put('/:id/status', updateClaimStatus);
+router.get("/articles/:id", getArticleById);
+router.get("/by-article/:id", getClaimByArticleId);
+router.get('/article/:articleId', async (req, res) => {
   try {
-    const { status } = req.body;
-    const claim = await Claim.findByIdAndUpdate(
-      req.params.id,
-      { status },
-      { new: true }
-    );
-    if (!claim) return res.status(404).json({ message: "Claim not found" });
+    const claim = await Claim.findOne({
+      article: new mongoose.Types.ObjectId(req.params.articleId),
+      status: 'Reviewed'
+    }).select('verdict sources');
+
+    if (!claim) return res.status(404).json({ message: 'No reviewed claim found' });
+
     res.json(claim);
-  } catch (error) {
-    res.status(500).json({ message: "Failed to update status", error });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Server error' });
   }
 });
+
+
 
 
 export default router;

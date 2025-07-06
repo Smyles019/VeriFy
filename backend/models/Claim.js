@@ -10,7 +10,14 @@ const claimSchema = new mongoose.Schema({
   verdict: String,  // <-- add this
   notes: String,    // <-- and this
   sources: [String], // <-- and this
-  evidence: String,  // <-- store file path or URL
+  evidence: String,
+  articleLink: {
+  type: String,
+  required: false},
+  article: {
+  type: mongoose.Schema.Types.ObjectId,
+  ref: "Article",
+}, 
   reviewedBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User' }, // optional
 }, { timestamps: true });
 

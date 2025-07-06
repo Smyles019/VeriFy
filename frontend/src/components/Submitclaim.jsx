@@ -1,15 +1,25 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import axios from "axios";
 
-const SubmitClaim = () => {
+const SubmitClaim = ({ articleId, articleTitle, articleDescription }) => {
   const [formData, setFormData] = useState({
     title: "",
     content: "",
     category: "",
   });
+
   const [image, setImage] = useState(null);
   const [submitting, setSubmitting] = useState(false);
   const [message, setMessage] = useState("");
+
+  // Pre-fill from article props
+  useEffect(() => {
+    setFormData((prev) => ({
+      ...prev,
+      title: articleTitle || "",
+      content: articleDescription || "",
+    }));
+  }, [articleTitle, articleDescription]);
 
   const handleChange = (e) => {
     setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
@@ -26,6 +36,7 @@ const SubmitClaim = () => {
       const data = new FormData();
       Object.entries(formData).forEach(([key, val]) => data.append(key, val));
       if (image) data.append("image", image);
+      if (articleId) data.append("articleId", articleId); // 🔗 Linking here
 
       await axios.post("http://localhost:5000/api/claims", data, {
         headers: {
@@ -44,11 +55,16 @@ const SubmitClaim = () => {
     }
   };
 
-  
-
   return (
     <div className="max-w-xl mx-auto p-4 bg-white rounded-lg shadow-md text-sm">
       <h2 className="text-xl font-semibold mb-3 text-center">Submit a Claim</h2>
+
+      {articleId && (
+        <div className="text-blue-700 text-sm mb-3 text-center">
+          📎 Linked to article: <strong>{articleTitle}</strong>
+        </div>
+      )}
+
       <form onSubmit={handleSubmit} className="space-y-3">
         <div>
           <label className="block mb-1">Title</label>
@@ -109,6 +125,5 @@ const SubmitClaim = () => {
     </div>
   );
 };
-
 
 export default SubmitClaim;

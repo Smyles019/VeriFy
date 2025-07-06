@@ -13,6 +13,7 @@ import { dirname } from 'path';
 import multer from 'multer';
 import fs from 'fs';
 import claimRoutes from './routes/claimRoutes.js';
+import articleActions from  './routes/articleActions.js';
 
 dotenv.config();
 const app = express();
@@ -36,6 +37,7 @@ app.use("/api/auth", authRoutes);
 app.use("/api/admin", adminRoutes); 
 app.use("/api/users", userRoutes);
 app.use("/api/claims", claimRoutes);
+app.use("/api/articles", articleActions);
 
 app.get('/api/user/:id', async (req, res) => {
   const user = await User.findById(req.params.id);

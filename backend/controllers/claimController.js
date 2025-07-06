@@ -1,4 +1,28 @@
-import Claim from '../models/Claim.js';
+import Article from "../models/Article.js";
+import Claim from "../models/Claim.js";
+
+export const getArticleById = async (req, res) => {
+  try {
+    const article = await Article.findById(req.params.id).lean();
+    if (!article) return res.status(404).json({ message: "Article not found" });
+
+    // 🔍 Get the latest "Reviewed" claim linked to this article
+    const reviewedClaim = await Claim.findOne({
+      article: article._id,
+      status: "Reviewed",
+    }).sort({ updatedAt: -1 }).lean();
+
+    if (reviewedClaim) {
+  article.verdict = reviewedClaim.verdict;
+  article.reviewerNotes = reviewedClaim.notes;
+  article.sources = reviewedClaim.sources;
+}
+    res.json(article);
+  } catch (err) {
+    console.error("Failed to get article:", err);
+    res.status(500).json({ message: "Server error" });
+  }
+};
 
 export const createClaim = async (req, res) => {
   try {
@@ -12,6 +36,8 @@ export const createClaim = async (req, res) => {
       user: req.user._id,
       image: imagePath,
       status: "Processing",
+      article: req.body.articleId, 
+      submittedBy: req.user.id,
     });
 
     await newClaim.save();
@@ -71,14 +97,57 @@ export const reviewClaim = async (req, res) => {
     claim.reviewedBy = reviewerId;
 
     if (req.file) {
-      claim.evidence = req.file.path; // or `/uploads/${req.file.filename}`
+      claim.evidence = req.file.path;
     }
 
     await claim.save();
+
+    // ✅ Update related article if it exists
+    if (claim.article) {
+      await Article.findByIdAndUpdate(claim.article, {
+        verdict,
+        reviewerNotes: notes,
+        sources,
+      });
+    }
+
     res.json({ message: "Claim reviewed successfully", claim });
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Server error", error: error.message });
   }
 };
+export const updateClaimStatus = async (req, res) => {
+  const { id } = req.params;
+  const { status } = req.body;
+
+  try {
+    const updatedClaim = await Claim.findByIdAndUpdate(id, { status }, { new: true });
+
+    if (!updatedClaim) {
+      return res.status(404).json({ message: "Claim not found" });
+    }
+
+    res.status(200).json(updatedClaim);
+  } catch (err) {
+    console.error("Error updating claim status:", err);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+export const getClaimByArticleId = async (req, res) => {
+  try {
+    const claim = await Claim.findOne({ article: req.params.id });
+
+    if (!claim) {
+      return res.status(404).json({ message: "No claim found for this article" });
+    }
+
+    res.json(claim);
+  } catch (error) {
+    console.error("Error fetching claim by article ID:", error);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
 

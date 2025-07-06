@@ -15,7 +15,14 @@ const articleSchema = new mongoose.Schema({
      ref: 'Draft'
    }
 }, {
-   timestamps: true 
+   timestamps: true,
+   likes: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
+   dislikes: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
+   flags: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }], 
+   verdict: { type: String },
+   reviewerNotes: { type: String },
+   sources: [String],
+
 });
 
 //Index for better query performance

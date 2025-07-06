@@ -32,30 +32,30 @@ const ClaimDetails = () => {
   const currentClaims = allClaims.filter((claim) => claim.status === 'Reviewing');
   const reviewedClaims = allClaims.filter((claim) => claim.status === 'Reviewed');
 
-  const handleClaimClick = async (claimId) => {
-    try {
-      // Update status to Reviewing
-      await axios.put(
-        `http://localhost:5000/api/claims/${claimId}/status`,
-        { status: "Reviewing" },
-        {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
-          },
-        }
-      );
-
-      // Refresh claim list after status update
-      const res = await axios.get("http://localhost:5000/api/claims", {
+  const handleClaimClick = async (claimId, newStatus) => {
+  try {
+    await axios.put(
+      `http://localhost:5000/api/claims/${claimId}/status`,
+      { status: newStatus },
+      {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("token")}`,
         },
-      });
-      setAllClaims(res.data);
-    } catch (err) {
-      console.error("Failed to update claim status:", err);
-    }
-  };
+      }
+    );
+
+    // Refresh claims after update
+    const res = await axios.get("http://localhost:5000/api/claims", {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+      },
+    });
+    setAllClaims(res.data);
+  } catch (err) {
+    console.error("Failed to update claim status:", err);
+  }
+};
+
 
   return (
     <div className="relative min-h-screen bg-gray-100 p-6 font-sans">
@@ -106,12 +106,12 @@ const ClaimDetails = () => {
                 newClaims.map((claim) => (
                   <li key={claim._id}>
                     <Link
-                      to={`/review/${claim._id}`}
-                      onClick={() => handleClaimClick(claim._id)}
-                      className="underline hover:text-yellow-300 transition"
-                    >
-                      {claim.title}
-                    </Link>
+  to={`/review/${claim._id}`}
+  onClick={() => handleClaimClick(claim._id, "Reviewing")} // ✅ fixed
+  className="underline hover:text-yellow-300 transition"
+>
+  {claim.title}
+</Link>
                   </li>
                 ))
               )}

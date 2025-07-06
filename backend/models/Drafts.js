@@ -5,7 +5,9 @@ const draftSchema = new mongoose.Schema({
     content: { type: String},
     tags: [String],
     image: { type: String, default: ''},
+    submittedBy: String,
     createdAt: { type: Date, default: Date.now},
+   
 });
 
 export default mongoose.model("Draft", draftSchema);

@@ -14,6 +14,7 @@ import multer from 'multer';
 import fs from 'fs';
 import claimRoutes from './routes/claimRoutes.js';
 import articleActions from  './routes/articleActions.js';
+import applicationRoutes from './routes/applicationRoutes.js';
 
 dotenv.config();
 const app = express();
@@ -30,7 +31,6 @@ const upload = multer({ storage });
 
 app.use(cors());
 app.use(express.json());
-app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 
 app.use("/api/auth", authRoutes);
@@ -38,6 +38,10 @@ app.use("/api/admin", adminRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/claims", claimRoutes);
 app.use("/api/articles", articleActions);
+app.use("/api/applications", applicationRoutes);
+app.use("/uploads", express.static("uploads"));
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+
 
 app.get('/api/user/:id', async (req, res) => {
   const user = await User.findById(req.params.id);

@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 import React from "react";
 
 
-const Sidebar = ({ isOpen, onClose }) => {
+const ReaderSidebar = ({ isOpen, onClose }) => {
   const navigate = useNavigate();
   const handleLogout = () => {
   localStorage.removeItem('token');
@@ -25,8 +25,8 @@ const Sidebar = ({ isOpen, onClose }) => {
       </div>
       <ul className="p-4 space-y-4">
         <li><a href="/" className="text-blue-700 hover:underline">Home</a></li>
-        <li><a href="/factcheckerdashboard" className="text-blue-700 hover:underline">Account</a></li>
-        <li><a href="/claimdetails" className="text-blue-700 hover:underline">Claims</a></li>
+        <li><a href="/readerdashboard" className="text-blue-700 hover:underline">Account</a></li>
+        <li><a href="/reader/myapplications" className="text-blue-700 hover:underline">Apply to be a Reporter</a></li>
         <li><a href="/login" onClick={handleLogout} className="text-blue-700 hover:underline">Logout</a></li>
         <li><a href="/help" className="text-blue-700 hover:underline">Help</a></li>
 
@@ -36,4 +36,4 @@ const Sidebar = ({ isOpen, onClose }) => {
   );
 };
 
-export default Sidebar;
+export default ReaderSidebar;

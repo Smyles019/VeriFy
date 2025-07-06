@@ -22,6 +22,10 @@ import ArticlePage from './pages/ArticlePage'
 import SubmitClaim from './components/Submitclaim'
 import MyClaims from './pages/MyClaims'
 import ClaimReview from './pages/ReviewClaim'
+import ReaderDashboard from './pages/ReaderDashboard'
+import Application from './components/ApplicationModal'
+import ReaderApplications from './components/ReporterApplications'
+import MyApplications from './components/Myapplications'
 
 const Home = () => {
   const [approvedArticles, setApprovedArticles] = useState([]);
@@ -86,6 +90,10 @@ const App = () => {
         <Route path="/article/:id" element={<ArticlePage />} />
         <Route path="/review/:id" element={<ClaimReview />} />
         <Route path="/myclaims" element={<MyClaims />} />
+        <Route path="/readerdashboard" element={<ReaderDashboard />} />
+        <Route path="/application" element={<Application />} />
+        <Route path="/admin/applications" element={<ReaderApplications />} />
+        <Route path="/reader/myapplications" element={<MyApplications />} />
 
 
   

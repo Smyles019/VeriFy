@@ -138,7 +138,6 @@ await axios.delete(`http://localhost:5000/api/users/${userId}`, {
                   )}
                 </td>
                 <td className="px-6 py-4 text-center space-x-2">
-                  <button className="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600">Edit</button>
                   <button
   onClick={() => handleDeleteUser(user._id)}
   className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600"

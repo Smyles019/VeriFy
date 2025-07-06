@@ -1,5 +1,6 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
 
 
 const Register = () => {
@@ -11,15 +12,24 @@ const Register = () => {
 
   const form = e.target;
   const firstName = form[0].value.trim();
-const lastName = form[1].value.trim();
+  const lastName = form[1].value.trim();
+  const email = form[2].value.trim();
+  const phone = form[3].value.trim();
+  const password = form[4].value;
+  const confirmPassword = form[5].value;
+
+  if (password !== confirmPassword) {
+    toast.error("Passwords do not match!");
+    return;
+  }
 
 const data = {
   firstName,
   lastName,
   username: `${firstName}${lastName}`.toLowerCase(), // e.g., janedoe
-  email: form[2].value,
-  phone: form[3].value,
-  password: form[4].value,
+  email,
+  phone,
+  password,
 };
 
 
@@ -35,14 +45,14 @@ const data = {
     const result = await res.json();
 
     if (res.ok) {
-      alert("Registered successfully!");
-      navigate("/login");
+      toast.success("Registered successfully!");
+      setTimeout(() => navigate("/login"), 2000);
     } else {
-      alert(result.error || "Registration failed");
+      toast.error(result.error || "Registration failed");
     }
   } catch (err) {
     console.error(err);
-    alert("Something went wrong");
+     toast.error("Something went wrong");
   }
 };
 

@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react'
 import axios from 'axios'
 import AdminSidebar from '../components/AdminSidebar'
 import { FaBars } from 'react-icons/fa'
+import { ToastContainer } from 'react-toastify';
 
 
 const UsersTable = () => {
@@ -47,7 +48,7 @@ await axios.put(
     console.log('✅ Role updated successfully')
   } catch (err) {
     console.error('❌ Failed to update role:', err)
-    alert('Failed to update role')
+    toast.error('Failed to update role');
   }
 }
 
@@ -67,7 +68,7 @@ await axios.delete(`http://localhost:5000/api/users/${userId}`, {
     console.log('🗑️ User deleted successfully')
   } catch (err) {
     console.error('❌ Error deleting user:', err.response?.data || err.message)
-    alert('Failed to delete user')
+    toast.error('Failed to delete user');
   }
 }
 

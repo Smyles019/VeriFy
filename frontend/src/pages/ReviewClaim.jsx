@@ -3,6 +3,7 @@ import { useParams, useNavigate, Link } from "react-router-dom";
 import { FaBars } from "react-icons/fa";
 import Sidebar from "../components/Sidebar";
 import axios from "axios";
+import { toast } from "react-toastify";
 
 const verdictColors = {
   True: "bg-green-100 text-green-800",
@@ -93,11 +94,11 @@ const ClaimReview = () => {
           },
         }
       );
-      alert("Review submitted successfully!");
+      toast.success("Review submitted successfully!");
       navigate("/claimdetails");
     } catch (err) {
       console.error("Failed to submit review:", err);
-      alert("Error submitting review");
+      toast.error("Error submitting review");
     }
   };
 

@@ -90,32 +90,20 @@ export const deleteUser = async (req, res) => {
 };
 
 // === Multer Storage Config for Profile Pic ===
+// Storage config
 const storage = multer.diskStorage({
-  destination: function (req, file, cb) {
-    cb(null, 'uploads/'); // Ensure this folder exists
-  },
-  filename: function (req, file, cb) {
-    const uniqueName = Date.now() + '-' + file.originalname;
-    cb(null, uniqueName);
-  }
+  destination: (req, file, cb) => cb(null, 'uploads/'),
+  filename: (req, file, cb) => cb(null, Date.now() + '-' + file.originalname),
 });
-export const upload = multer({ storage });
 
-// === POST: Upload profile picture ===
 export const uploadProfilePic = async (req, res) => {
-  if (!req.file) return res.status(400).json({ message: 'No file uploaded' });
-
-  const profilePicUrl = `uploads/${req.file.filename}`; // relative path!
- try {
-    // ✅ Save to DB so it's persisted
-    const user = await User.findByIdAndUpdate(
-      req.user.id,
-      { profilePicUrl },
-      { new: true }
-    );
-
-  res.status(200).json({ profilePicUrl });
+  try {
+    const user = await User.findById(req.user.id);
+    user.profilePicUrl = `uploads/${req.file.filename}`;
+    await user.save();
+    res.json({ profilePicUrl: user.profilePicUrl });
   } catch (err) {
-    res.status(500).json({ message: 'Failed to save profile picture', error: err });
+    console.error(err);
+    res.status(500).json({ message: 'Upload failed' });
   }
 };

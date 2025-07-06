@@ -126,3 +126,29 @@ export const deleteCommentFromArticle = async (req, res) => {
     res.status(500).json({ message: "Server error" });
   }
 };
+
+export const getFlaggedArticles = async (req, res) => {
+  try {
+    const flaggedArticles = await Article.aggregate([
+      {
+        $addFields: {
+          flagCount: { $size: { $ifNull: ["$flags", []] } }
+        }
+      },
+      {
+        $match: {
+          flagCount: { $gt: 0 }
+        }
+      },
+      {
+        $sort: { flagCount: -1, createdAt: -1 } // Sort by flag count descending, then newest
+      }
+    ]);
+
+    res.json(flaggedArticles);
+  } catch (err) {
+    console.error('Failed to fetch flagged articles:', err);
+    res.status(500).json({ message: 'Server error fetching flagged articles' });
+  }
+};
+

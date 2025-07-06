@@ -64,8 +64,10 @@ const Navbar = () => {
       <nav className="bg-blue-800 text-white px-6 py-4 flex justify-between items-center">
         {/* Left: Logo */}
         <div className="flex items-center space-x-4">
-          <img className="w-12" src={logo} alt="logo" />
-        </div>
+  <Link to="/">
+    <img className="w-12 cursor-pointer" src={logo} alt="logo" />
+  </Link>
+</div>
 
         {/* Center: Title */}
         <h1 className="absolute left-1/2 transform -translate-x-1/2 text-xl font-bold">

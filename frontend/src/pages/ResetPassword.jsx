@@ -1,6 +1,7 @@
 // src/pages/ResetPassword.jsx
 import { useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
+import { toast } from "react-toastify";
 
 
 const ResetPassword = () => {
@@ -17,12 +18,13 @@ const ResetPassword = () => {
     });
 
     const data = await res.json();
-    alert(data.message);
-
     if (res.ok) {
-    navigate("/login"); 
-  }
-  };
+      toast.success(data.message || "Password reset successful!");
+      navigate("/login");
+    } else {
+      toast.error(data.message || "Failed to reset password");
+    }
+};
 
   return (
     <form onSubmit={handleSubmit} className="p-10 space-y-4 max-w-md mx-auto">

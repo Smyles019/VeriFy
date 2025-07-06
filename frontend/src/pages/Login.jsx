@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Link } from "react-router-dom";
+import { toast } from "react-toastify";
 
 const Login = () => {
   const navigate = useNavigate();
@@ -35,8 +36,8 @@ const Login = () => {
           localStorage.setItem("reporterName", user.fullName || user.email);
         }
 
-        window.dispatchEvent(new Event("login"));
-        alert("Logged in successfully!");
+       window.dispatchEvent(new Event("login"));
+      toast.success("Logged in successfully!");
 
         switch (user.role) {
           case "admin": navigate("/adminDashboard"); break;
@@ -46,10 +47,10 @@ const Login = () => {
           default: navigate("/readerDashboard"); break;
         }
       } else {
-        alert(data.message || "Login failed");
+        toast.error(data.message || "Login failed");
       }
     } catch (err) {
-      alert("Error: " + err.message);
+      toast.error("Error: " + err.message);
     }
   };
 

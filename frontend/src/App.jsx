@@ -27,6 +27,11 @@ import Application from './components/ApplicationModal'
 import ReaderApplications from './components/ReporterApplications'
 import MyApplications from './components/Myapplications'
 import AllClaims from './components/AdminClaimList'
+import ReaderClaims from './pages/Readerclaims'
+import FlaggedArticles from './components/FlaggedArticles'
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+
 
 
 const Home = () => {
@@ -71,6 +76,9 @@ const App = () => {
     return( 
     <Router>
      <Navbar />  
+
+    <ToastContainer position="top-center" autoClose={3000} />
+     
      <div className='p-4'>
       <Routes>
         <Route path="/" element={<Home />} />
@@ -96,8 +104,10 @@ const App = () => {
         <Route path="/application" element={<Application />} />
         <Route path="/admin/applications" element={<ReaderApplications />} />
         <Route path="/reader/myapplications" element={<MyApplications />} />
+        <Route path="/reader/myclaims" element={<ReaderClaims />} />
         <Route path="/admin/claims" element={<AllClaims />} />
         <Route path="/claim/:id" element={<ClaimDetails />} />
+        <Route path="/admin/flagged-articles" element={<FlaggedArticles />} />
 
 
   

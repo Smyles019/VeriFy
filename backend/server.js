@@ -27,8 +27,8 @@ const storage = multer.diskStorage({
   destination: (req, file, cb) => cb(null, 'uploads/'),
   filename: (req, file, cb) => cb(null, Date.now() + '-' + file.originalname),
 });
-
 const upload = multer({ storage });
+
 
 app.use(cors());
 app.use(express.json());
@@ -43,6 +43,7 @@ app.use("/api/applications", applicationRoutes);
 app.use("/uploads", express.static("uploads"));
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 app.use('/api/articles', articleRoutes);
+app.use('/uploads', express.static(path.join(process.cwd(), 'uploads')));
 
 app.get('/api/user/:id', async (req, res) => {
   const user = await User.findById(req.params.id);

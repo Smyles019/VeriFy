@@ -5,6 +5,7 @@ import 'react-quill/dist/quill.snow.css'
 import axios from 'axios'
 import Modal from '../components/Modal'
 import EditorSidebar from "../components/editorSidebar"
+import { toast } from "react-toastify";
 
 const EditorDashboard = () => {
     const [isEditorSidebarOpen, setEditorSidebarOpen] = useState(false);
@@ -86,10 +87,10 @@ const EditorDashboard = () => {
         article._id === articleId ? {...article, status: 'approved'} : article       
       ));
 
-      alert('Article approved!');
+      toast.success('Article approved!');
     } catch (error) {
         console.error('Failed to approve article:', error);
-        alert('Failed to approve article');
+        toast.error('Failed to approve article');
     }
   };
 
@@ -104,10 +105,10 @@ const EditorDashboard = () => {
           article._id === articleId ? {...article, status: 'rejected'} : article
        ));
 
-       alert ('Article rejected');
+       toast.success('Article rejected');
      } catch (error){
         console.error('Failed to reject article:', error);
-        alert('Failed to reject article');
+        toast.error('Failed to reject article')
      }
   };
 
@@ -352,10 +353,10 @@ const EditorDashboard = () => {
                 )
              );
              setEditModalOpen(false);
-             alert("Article updated!");
+             toast.success("Article updated!");
              } catch (error) {
                 console.error("Error updating article:", error);
-                alert("Failed to update article.");
+                toast.error("Failed to update article.");
              } finally {
                 setSaving(false);
              }

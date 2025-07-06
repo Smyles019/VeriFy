@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import AdminSidebar from "../components/AdminSidebar";
 import { FaBars } from "react-icons/fa";
 import UserProfileCard from "../components/UserProfile";
+import { toast } from "react-toastify";
 
 
 
@@ -46,13 +47,13 @@ const handleRoleUpdate = async (userId, newRole) => {
 
     const data = await res.json();
     if (res.ok) {
-      alert("Role updated successfully!");
+      toast.success("Role updated successfully!");
     } else {
-      alert("Failed to update role: " + data.message);
+      toast.error("Failed to update role: " + data.message);
     }
   } catch (err) {
     console.error("Error updating role:", err);
-    alert("Server error");
+    toast.error("Server error");
   }
 };
 

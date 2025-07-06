@@ -6,6 +6,7 @@ import {
   addCommentToArticle,
   getArticleComments,
   deleteCommentFromArticle,
+  getFlaggedArticles,
 } from '../controllers/articleController.js';
 import { protect } from '../middleware/authMiddleware.js';
 
@@ -17,5 +18,6 @@ router.post('/:id/flag', protect, flagArticle);
 router.post('/:id/comments', protect, addCommentToArticle);
 router.get('/:id/comments', getArticleComments);
 router.delete('/:articleId/comments/:commentId', protect, deleteCommentFromArticle);
+router.get('/flagged', protect, getFlaggedArticles);
 
 export default router;

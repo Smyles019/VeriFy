@@ -5,9 +5,18 @@ const userSchema = new mongoose.Schema({
   lastName: { type: String },
   username: { type: String, unique: true },
   email: { type: String, required: true, unique: true },
-  phone: { type: String },
-  password: { type: String, required: true },
-  profilePic: { type: String },
+  phone: {
+  type: String,
+  required: [true, "Phone number is required"],
+  unique: true,
+  match: [/^(\+254|0)(1\d{8}|7\d{8})$/, "Please enter a valid Kenyan phone number"]
+},
+  password: {
+  type: String,
+  required: [true, "Password is required"],
+  minlength: [8, "Password must be at least 8 characters"],
+},
+  profilePicUrl: { type: String },
   resetPasswordToken: { type: String },
   resetPasswordExpire: { type: Date },
   role: {

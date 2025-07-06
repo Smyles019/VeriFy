@@ -4,9 +4,9 @@ import Modal from '../components/Modal'
 import ReactQuill from 'react-quill'
 import 'react-quill/dist/quill.snow.css'
 import axios from 'axios'
-import logo from '../assets/logo.png'
-import { Link } from 'react-router-dom';
 import ReporterSidebar from '../components/ReporterSidebar'
+import { toast } from 'react-toastify';
+
 
 const ReporterDashboard = () => {
   const [isReporterSidebarOpen, setReporterSidebarOpen] = useState(false);
@@ -142,7 +142,7 @@ const ReporterDashboard = () => {
 
      if(response.status === 200 || response.status === 201){
         //Show success message
-        alert('Draft sent successfully');
+        toast.success('Draft sent successfully!');
         
         //Close modal and reset form
         setModalOpen(false);
@@ -157,14 +157,15 @@ const ReporterDashboard = () => {
      }
     } catch (error) {
       console.error('Failed to send draft:', error);
-      alert('Failed to send draft. Please try again.');
+      toast.error('Failed to send draft. Please try again.');
     }
   };
 
   const handleDelete = async (id) => {
     try{
       await axios.delete(`http://localhost:5000/api/drafts/${id}`);
-      setDrafts(drafts.filter(d => d._id !==id ));   
+      setDrafts(drafts.filter(d => d._id !==id )); 
+      toast.success('Draft deleted successfully.');  
     } catch (error){
       console.error('Failed to delete draft:', error);
     }

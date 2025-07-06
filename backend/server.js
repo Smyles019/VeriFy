@@ -57,8 +57,10 @@ app.put('/api/user/:id', async (req, res) => {
 
 //Fetching drafts from reporter dashboard
 app.get('/api/drafts', async (req, res) => {
-  try{
-  const drafts = await Drafts.find().sort({ createdAt: -1 });
+  try {
+  const { submittedBy }  = req.query;
+  const filter = submittedBy ? { submittedBy } : {};
+  const drafts = await Drafts.find(filter).sort({ createdAt: -1 });
   res.json(drafts);
  } catch (error){
   console.error('Error fetching drafts:', error);
@@ -69,13 +71,14 @@ app.get('/api/drafts', async (req, res) => {
 app.post('/api/drafts', upload.single('image'), async (req, res) => {
   console.log('Received draft:', req.body);
   try {
-    const { title, content, tags } = req.body;
+    const { title, content, tags, submittedBy } = req.body;
     const image = req.file ? req.file.filename : null;
     const newDraft = new Drafts({
       title,
       content,
       tags: tags ? [tags] : [],  
-      image
+      image,
+      submittedBy
   });
     await newDraft.save();
     res.status(201).json(newDraft);

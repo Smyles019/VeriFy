@@ -4,10 +4,11 @@ import { Link } from "react-router-dom"
 import ArticleCard from "./ArticleCard"
  
 const NewsSection = ({ title, articles }) => {
+  const sectionTitle = title || articles[0]?.category || articles[0]?.tags?.[0] || "Latest";
 
     return(
       <section className="px-8 py-6">
-         <h2 className="text-2xl font-bold mb-6">Latest</h2>
+         <h2 className="text-2xl font-bold mb-6">{sectionTitle}</h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {articles.map((article, index) => (
               <Link to={`/article/${article._id}`} key={index} className="bg-white rounded-lg shadow p-4 flex flex-col hover:shadow-lg transition-shadow" >
@@ -35,6 +36,5 @@ const NewsSection = ({ title, articles }) => {
       </section>  
     )
 }
-
 
 export default NewsSection

@@ -187,7 +187,7 @@ const EditorDashboard = () => {
                             <img 
                                src={`http://localhost:5000/uploads/${article.image}`}
                                alt="Article"
-                               className="w-full h-40 object-cover rounded mb-3"
+                               className="w-full max-w-xs mb-3 rounded"
                             />
                           )}
                           <div className="flex items-center gap-3 mb-2">

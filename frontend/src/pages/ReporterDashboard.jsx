@@ -19,6 +19,7 @@ const ReporterDashboard = () => {
   const [newTag, setNewTag] = useState("");
   const [imageFile, setImageFile] = useState(null);
   const [imagePreview, setImagePreview] = useState(null);
+  const [user, setUser] = useState(null);
   const [reporterName, setReporterName] = useState("");
 
   //State for editing drafts
@@ -26,12 +27,19 @@ const ReporterDashboard = () => {
   const [isEditing, setIsEditing] = useState(false);
 
   useEffect(() => {
-    axios.get("http://localhost:5000/api/drafts")
-       .then(res => setDrafts(res.data))
-       .catch(err => console.error(err));
+    const storedUser = JSON.parse(localStorage.getItem('user'));
+    console.log("Logged-in user:", storedUser);
+    setUser(storedUser);
 
-      const currentUser = localStorage.getItem('reporterName') || 'John Doe';
-      setReporterName(currentUser);
+    if (storedUser?.fullName) {
+    axios.get(`http://localhost:5000/api/drafts?submittedBy=${storedUser.fullName}`)
+       .then(res => {
+         console.log("Filtered drafts:", res.data);
+         setDrafts(res.data); 
+       })
+       .catch(err => console.error(err));
+       setReporterName(storedUser.fullName || storedUser.email);
+    }
   }, []);
 
   //Function to open modal for new article
@@ -72,6 +80,8 @@ const ReporterDashboard = () => {
       formData.append('title', title);
       formData.append('content', content);
       formData.append('tags', tags[0] || '');
+      formData.append('submittedBy', user.fullName);
+
       if (imageFile){
         formData.append('image', imageFile);
       } else if (isEditing && editingDraft?.image) {
@@ -121,7 +131,7 @@ const ReporterDashboard = () => {
         } else if (isEditing && editingDraft?.image) {
           formData.append('existingImage', editingDraft.image); 
         } 
-        formData.append('submittedBy', reporterName);  
+        formData.append('submittedBy', user.fullName);  
         formData.append('submittedAt', new Date().toLocaleString());
         formData.append('status', 'pending_review');
 

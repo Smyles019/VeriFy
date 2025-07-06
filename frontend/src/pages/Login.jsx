@@ -30,6 +30,11 @@ const Login = () => {
 
         localStorage.setItem("token", token);
         localStorage.setItem("user", JSON.stringify(user));
+
+        if (user.role === "reporter") {
+          localStorage.setItem("reporterName", user.fullName || user.email);
+        }
+
         window.dispatchEvent(new Event("login"));
         alert("Logged in successfully!");
 

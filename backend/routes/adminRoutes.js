@@ -1,6 +1,7 @@
 import express from 'express';
 import User from '../models/User.js';
 import Article from '../models/Article.js';
+import Claim from '../models/Claim.js';
 
 
 const router = express.Router()
@@ -47,6 +48,18 @@ router.get('/articles', async (req, res) => {
   }
 });
 
+router.get('/claims', async (req, res) => {
+  try {
+    const claims = await Claim.find()
+      .populate({ path: "user", select: "email", strictPopulate: false })
+      .sort({ createdAt: -1 });
+
+    res.status(200).json(claims);
+  } catch (err) {
+    console.error("Failed to fetch claims:", err);
+    res.status(500).json({ message: 'Failed to fetch claims', error: err.message });
+  }
+});
 
 
 export default router;

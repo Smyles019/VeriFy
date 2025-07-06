@@ -32,7 +32,7 @@ const AdminSidebar = ({ isOpen, onClose }) => {
         <Link to="/adminDashboard" className="hover:text-blue-300">Account</Link>
         <Link to="/admin/users" className="hover:text-blue-300">Users</Link>
         <Link to="/admin/articles" className="hover:text-blue-300">Articles</Link>
-         <Link to="/admin/reporters" className="hover:text-blue-300">Claims</Link>
+         <Link to="/admin/claims" className="hover:text-blue-300">Claims</Link>
           <Link to="/admin/reporters" className="hover:text-blue-300">Flagged articles</Link>
         <Link to="/admin/applications" className="hover:text-blue-300">Reporter applications</Link>
         <Link to="logout" onClick={handleLogout} className="hover:text-blue-300">Logout</Link>

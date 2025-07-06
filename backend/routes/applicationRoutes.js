@@ -1,7 +1,7 @@
 import express from "express";
 import upload from "../middleware/uploadMiddleware.js";
 import ReaderApplication from "../models/ReaderApplication.js";
-import { protect, isAdmin } from "../middleware/adminMiddleware.js";
+import { protect, isAdmin } from "../middleware/authMiddleware.js";
 import { sendStatusEmail } from "../utils/sendEmail.js";
 
 const router = express.Router();

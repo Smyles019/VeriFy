@@ -26,6 +26,8 @@ import ReaderDashboard from './pages/ReaderDashboard'
 import Application from './components/ApplicationModal'
 import ReaderApplications from './components/ReporterApplications'
 import MyApplications from './components/Myapplications'
+import AllClaims from './components/AdminClaimList'
+
 
 const Home = () => {
   const [approvedArticles, setApprovedArticles] = useState([]);
@@ -94,6 +96,8 @@ const App = () => {
         <Route path="/application" element={<Application />} />
         <Route path="/admin/applications" element={<ReaderApplications />} />
         <Route path="/reader/myapplications" element={<MyApplications />} />
+        <Route path="/admin/claims" element={<AllClaims />} />
+        <Route path="/claim/:id" element={<ClaimDetails />} />
 
 
   

@@ -1,3 +1,4 @@
+// adminMiddleware.js
 import jwt from "jsonwebtoken";
 import User from "../models/User.js";
 
@@ -12,4 +13,11 @@ export const protect = async (req, res, next) => {
   } catch (err) {
     res.status(401).json({ message: "Invalid token" });
   }
+};
+
+export const isAdmin = (req, res, next) => {
+  if (req.user?.role !== "admin") {
+    return res.status(403).json({ message: "Access denied: Admins only" });
+  }
+  next();
 };

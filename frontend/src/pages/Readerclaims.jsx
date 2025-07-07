@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { FaBars } from "react-icons/fa";
-import ReaderSidebar from "../components/ReporterSidebar";
+import ReaderSidebar from "../components/ReaderSidebar";
 import SubmitClaim from "../components/Submitclaim";
 
 const ReaderClaims = () => {

@@ -104,7 +104,7 @@ const App = () => {
         <Route path="/application" element={<Application />} />
         <Route path="/admin/applications" element={<ReaderApplications />} />
         <Route path="/reader/myapplications" element={<MyApplications />} />
-        <Route path="/reader/myclaims" element={<ReaderClaims />} />
+        <Route path="/reader/readerclaims" element={<ReaderClaims />} />
         <Route path="/admin/claims" element={<AllClaims />} />
         <Route path="/claim/:id" element={<ClaimDetails />} />
         <Route path="/admin/flagged-articles" element={<FlaggedArticles />} />

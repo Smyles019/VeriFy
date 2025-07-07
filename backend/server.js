@@ -74,7 +74,7 @@ app.post('/api/drafts', upload.single('image'), async (req, res) => {
   try {
     const { title, content, tags, submittedBy } = req.body;
     const image = req.file ? req.file.filename : null;
-    const newDraft = new Drafts({
+    const newDraft = new Drafts ({
       title,
       content,
       tags: tags ? [tags] : [],  
@@ -142,7 +142,7 @@ app.post('/api/articles', upload.single('image'), async (req, res) => {
   try{
     //creating new article from submitted draft
     const { title, content, tags, submittedBy, submittedAt, status } = req.body;
-    const image = req.file ? req.file.filename : null;
+    const image = req.file ? req.file.filename : req.body.existingImage || null;
     const articleData = {
       title,
       content,

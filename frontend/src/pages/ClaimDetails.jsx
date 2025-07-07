@@ -1,12 +1,15 @@
 import { useState, useEffect } from 'react';
-import { FaBell, FaBars, FaSpinner, FaCheckCircle } from 'react-icons/fa';
+import { FaBell, FaBars, FaSpinner, FaCheckCircle, FaTimes } from 'react-icons/fa';
 import axios from 'axios';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import Sidebar from '../components/Sidebar';
 
 const ClaimDetails = () => {
   const [isSidebarOpen, setSidebarOpen] = useState(false);
   const [allClaims, setAllClaims] = useState([]);
+  const [selectedClaim, setSelectedClaim] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const navigate = useNavigate();
 
   const toggleSidebar = () => setSidebarOpen((prev) => !prev);
 
@@ -30,6 +33,22 @@ const ClaimDetails = () => {
   const newClaims = allClaims.filter((claim) => claim.status === 'Processing');
   const currentClaims = allClaims.filter((claim) => claim.status === 'Reviewing');
   const reviewedClaims = allClaims.filter((claim) => claim.status === 'Reviewed');
+
+  const fetchClaimDetails = async (claimId) => {
+    try {
+      setIsLoading(true);
+      const res = await axios.get(`http://localhost:5000/api/claims/${claimId}`, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      });
+      setSelectedClaim(res.data);
+      setIsLoading(false);
+    } catch (error) {
+      console.error("Failed to fetch claim details:", error);
+      setIsLoading(false);
+    }
+  };
 
   const handleClaimClick = async (claimId, newStatus) => {
     try {
@@ -126,9 +145,12 @@ const ClaimDetails = () => {
               ) : (
                 reviewedClaims.map((claim) => (
                   <li key={claim._id}>
-                    <span className="block w-full text-left px-4 py-2 rounded-full bg-green-100 text-green-700 font-medium opacity-80 cursor-not-allowed">
+                    <button
+                      onClick={() => fetchClaimDetails(claim._id)}
+                      className="block w-full text-left px-4 py-2 rounded-full bg-green-100 text-green-700 font-medium opacity-80 hover:opacity-100"
+                    >
                       {claim.title}
-                    </span>
+                    </button>
                   </li>
                 ))
               )}
@@ -137,6 +159,48 @@ const ClaimDetails = () => {
 
         </div>
       </div>
+
+{selectedClaim && (
+  <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
+    <div className="relative w-full max-w-lg mx-4 md:mx-0 bg-white rounded-2xl p-6 shadow-2xl border border-slate-200 animate-scaleIn">
+      
+      {/* Close Button */}
+      <button
+        onClick={() => setSelectedClaim(null)}
+        className="absolute top-3 right-3 text-slate-600 hover:text-red-500 transition-all text-xl"
+      >
+        <FaTimes />
+      </button>
+
+      {/* Title */}
+      <h2 className="text-xl font-bold text-green-700 mb-4">{selectedClaim.title}</h2>
+
+      {/* Verdict Content */}
+      {isLoading ? (
+        <p className="text-slate-400 italic">Loading verdict...</p>
+      ) : (
+        <>
+          <p className="text-slate-800 text-sm whitespace-pre-wrap leading-relaxed mb-4">
+            {selectedClaim.verdict || "No verdict provided."}
+          </p>
+
+          {/* Edit Claim Button */}
+          <button
+            onClick={() => {
+              setSelectedClaim(null);
+              navigate(`/review/${selectedClaim._id}`);
+            }}
+            className="mt-2 px-4 py-2 rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-medium shadow-md transition-all"
+          >
+            Edit Claim
+          </button>
+        </>
+      )}
+    </div>
+  </div>
+)}
+
+
     </div>
   );
 };

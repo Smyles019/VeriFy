@@ -142,11 +142,11 @@ const Navbar = () => {
       {/* Bottom white section with nav links */}
       <div className="bg-gray-100 text-black px-6 py-2 flex justify-center space-x-6 text-sm font-medium">
         <Link to="/">LATEST</Link>
-        <Link to="/politics">POLITICS</Link>
-        <Link to="/health">HEALTH</Link>
-        <Link to="/business">BUSINESS</Link>
-        <Link to="/entertainment">ENTERTAINMENT</Link>
-        <Link to="/sports">SPORTS</Link>
+        <Link to="/">POLITICS</Link>
+        <Link to="/">HEALTH</Link>
+        <Link to="/">BUSINESS</Link>
+        <Link to="/">ENTERTAINMENT</Link>
+        <Link to="/">SPORTS</Link>
       </div>
     </>
   );
